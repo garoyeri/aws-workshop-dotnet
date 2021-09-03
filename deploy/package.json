@@ -1,0 +1,15 @@
+{
+  "name": "deploy",
+  "version": "1.0.0",
+  "description": "This is a blank project for C# development with CDK.",
+  "main": "index.js",
+  "scripts": {
+    "cdk": "cdk"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "aws-cdk": "1.121.0"
+  }
+}
