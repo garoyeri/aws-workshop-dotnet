@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# 
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1F8313BC-F870-460B-9394-138E5CE1B407}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AwsHelloWorldWeb", "src\AwsHelloWorldWeb\AwsHelloWorldWeb.csproj", "{8A826E9E-711C-46CF-9FCE-3E09ACB96912}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{8F7C98C6-346C-496B-BF32-0290BD5E9EA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AwsHelloWorldWeb.Tests", "test\AwsHelloWorldWeb.Tests\AwsHelloWorldWeb.Tests.csproj", "{1DFBE025-0774-4517-A58C-775A474D3C72}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8A826E9E-711C-46CF-9FCE-3E09ACB96912}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A826E9E-711C-46CF-9FCE-3E09ACB96912}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A826E9E-711C-46CF-9FCE-3E09ACB96912}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A826E9E-711C-46CF-9FCE-3E09ACB96912}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DFBE025-0774-4517-A58C-775A474D3C72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DFBE025-0774-4517-A58C-775A474D3C72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DFBE025-0774-4517-A58C-775A474D3C72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DFBE025-0774-4517-A58C-775A474D3C72}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8A826E9E-711C-46CF-9FCE-3E09ACB96912} = {1F8313BC-F870-460B-9394-138E5CE1B407}
+		{1DFBE025-0774-4517-A58C-775A474D3C72} = {8F7C98C6-346C-496B-BF32-0290BD5E9EA0}
+	EndGlobalSection
+EndGlobal
