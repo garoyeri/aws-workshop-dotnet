@@ -10,7 +10,15 @@ namespace Deploy
         public static void Main(string[] args)
         {
             var app = new App();
-            new DeployStack(app, "DeployStack", new StackProps
+            new DeployDnsStack(app, "DeployDnsStack", new StackProps
+            {
+                Env = new Amazon.CDK.Environment
+                {
+                    Account = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_ACCOUNT"),
+                    Region = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_REGION"),
+                }
+            });
+            new DeployLambdaStack(app, "DeployLambdaStack", new StackProps
             {
                 // If you don't specify 'env', this stack will be environment-agnostic.
                 // Account/Region-dependent features and context lookups will not work,
@@ -18,13 +26,13 @@ namespace Deploy
 
                 // Uncomment the next block to specialize this stack for the AWS Account
                 // and Region that are implied by the current CLI configuration.
-                /*
+                
                 Env = new Amazon.CDK.Environment
                 {
                     Account = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_ACCOUNT"),
                     Region = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_REGION"),
                 }
-                */
+                
 
                 // Uncomment the next block if you know exactly what Account and Region you
                 // want to deploy the stack to.
