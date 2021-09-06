@@ -17,6 +17,7 @@
     <PackageReference Include="Amazon.CDK.AWS.APIGatewayv2" Version="$(CDKVersion)" />
     <PackageReference Include="Amazon.CDK.AWS.APIGatewayv2.Integrations" Version="$(CDKVersion)" />
     <PackageReference Include="Amazon.CDK.AWS.ECR" Version="$(CDKVersion)" />
+    <PackageReference Include="Amazon.CDK.AWS.CertificateManager" Version="$(CDKVersion)" />
     <PackageReference Include="Amazon.CDK.ECR.Assets" Version="$(CDKVersion)" />
     <PackageReference Include="Amazon.CDK.AWS.Lambda" Version="$(CDKVersion)" />
     <PackageReference Include="Amazon.CDK.AWS.Route53" Version="$(CDKVersion)" />
