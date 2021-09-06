@@ -1,34 +1,36 @@
 {
-  "resource": "/{proxy+}",
-  "path": "/api/values",
-  "httpMethod": "GET",
+  "version": "2.0",
+  "routeKey": "$default",
+  "rawPath": "/api/values",
+  "rawQueryString": "",
+  "cookies": null,
   "headers": null,
-  "queryStringParameters": null,
-  "pathParameters": {
-    "proxy": "api/values"
+  "queryStringParameters": {
+    "parameter1": "value1,value2",
+    "parameter2": "value"
   },
-  "stageVariables": null,
   "requestContext": {
-    "accountId": "AAAAAAAAAAAA",
-    "resourceId": "5agfss",
-    "stage": "test-invoke-stage",
-    "requestId": "test-invoke-request",
-    "identity": {
-      "cognitoIdentityPoolId": null,
-      "accountId": "AAAAAAAAAAAA",
-      "cognitoIdentityId": null,
-      "caller": "BBBBBBBBBBBB",
-      "apiKey": "test-invoke-api-key",
-      "sourceIp": "test-invoke-source-ip",
-      "cognitoAuthenticationType": null,
-      "cognitoAuthenticationProvider": null,
-      "userArn": "arn:aws:iam::AAAAAAAAAAAA:root",
-      "userAgent": "Apache-HttpClient/4.5.x (Java/1.8.0_102)",
-      "user": "AAAAAAAAAAAA"
+    "accountId": "123456789012",
+    "apiId": "api-id",
+    "authentication": null,
+    "authorizer": null,
+    "domainName": "id.execute-api.us-east-1.amazonaws.com",
+    "domainPrefix": "id",
+    "http": {
+      "method": "GET",
+      "path": "/api/values",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "1.1.1.1",
+      "userAgent": "agent"
     },
-    "resourcePath": "/{proxy+}",
-    "httpMethod": "GET",
-    "apiId": "t2yh6sjnmk"
+    "requestId": "id",
+    "routeKey": "$default",
+    "stage": "$default",
+    "time": "12/Mar/2020:19:03:58 +0000",
+    "timeEpoch": 1583348638390
   },
-  "body": null
+  "body": null,
+  "pathParameters": {},
+  "isBase64Encoded": false,
+  "stageVariables": null
 }
