@@ -1,4 +1,4 @@
-# Are you there .NET? It's me, AWS
+# Are you there .NET? It's me, AWS.
 
 This project is a minimal .NET 5 ASP.NET Core web application that can be deployed on AWS as a Lambda or a Fargate container, or run locally.
 
@@ -28,7 +28,9 @@ After this point, I've made modifications, so if you want to see exactly what th
 
 ## Create the Deployment Scripts with CDK
 
-(TODO: add narrative on CDK)
+[AWS Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/) is a deployment technology from AWS that makes it easier to build up CloudFormation templates for deploying your code. You write your declarative deployment structures in a comfortable language such as TypeScript, C#, Python, or Java instead of creating them directly in YAML. CDK has an opionated approach on deploying into AWS that sets up a reasonably happy path as long as you stay near it. It also has a CloudFormation escape hatch where you can manually create CloudFormation constructs or create your own higher level constructs to do things the way you want.
+
+The following commands will generate the deployment project template:
 
 ```shell
 mkdir deploy
@@ -74,6 +76,47 @@ cd ..
 dotnet sln add deploy/src/Deploy
 dotnet build
 ```
+
+### A disclaimer on CDK versioning
+
+As you work with CDK, you'll pull new package references into your project to add support for other AWS services. Be very careful to keep the CDK version numbers exactly the same for all packages. The project file: `deploy/src/Deploy/Deploy.csproj` defines a property and a property group to make it easier to update all the versions if you decide to upgrade CDK to resolve issues or support newer services:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <!-- Roll forward to future major versions of the netcoreapp as needed -->
+    <RollForward>Major</RollForward>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CDKVersion>1.121.0</CDKVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- CDK Construct Library dependencies -->
+    <PackageReference Include="Amazon.CDK" Version="$(CDKVersion)" />
+    <PackageReference Include="Amazon.CDK.AWS.APIGatewayv2" Version="$(CDKVersion)" />
+    <PackageReference Include="Amazon.CDK.AWS.APIGatewayv2.Integrations" Version="$(CDKVersion)" />
+    <PackageReference Include="Amazon.CDK.AWS.ECR" Version="$(CDKVersion)" />
+    <PackageReference Include="Amazon.CDK.AWS.CertificateManager" Version="$(CDKVersion)" />
+    <PackageReference Include="Amazon.CDK.ECR.Assets" Version="$(CDKVersion)" />
+    <PackageReference Include="Amazon.CDK.AWS.Lambda" Version="$(CDKVersion)" />
+    <PackageReference Include="Amazon.CDK.AWS.Route53" Version="$(CDKVersion)" />
+    <PackageReference Include="Amazon.CDK.AWS.Route53.Targets" Version="$(CDKVersion)" />
+
+    <!-- jsii Roslyn analyzers (un-comment to obtain compile-time checks for missing required props -->
+    <PackageReference Include="Amazon.Jsii.Analyzers" Version="*" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>
+```
+
+This way, you can update the `<CDKVersion>` element once to update all the package references and keep them in lock step.
+
+There's little stopping you from staying with a particular version. CDK is based on CloudFormation whose template schema version is still dated `2010-09-09`. All the AWS services likewise tend to be very backwards compatible, so there's little chance of something suddenly completely stopping working. The only reason to upgrade would be to support bug fixes or if there's a new service or setting that is available only in new configuration schemas for those services.
 
 ## Setup AWS CLI
 
