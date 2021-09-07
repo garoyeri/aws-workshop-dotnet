@@ -24,6 +24,8 @@ code .
 
 At this point, you can run the web application like a normal ASP.NET Core application. Go ahead, try it!
 
+After this point, I've made modifications, so if you want to see exactly what those changes were, you can check the difference between what you generate locally and what the code looks like.
+
 ## Create the Deployment Scripts with CDK
 
 (TODO: add narrative on CDK)
@@ -72,4 +74,66 @@ cd ..
 dotnet sln add deploy/src/Deploy
 dotnet build
 ```
+
+## Setup AWS CLI
+
+The rest of the instructions assume that you've got an AWS account setup already, you've setup a programmatic access user, and created a local CLI profile called `"personal`" with the access key an secret key.
+
+## Deploying DNS
+
+If you have a domain name handy, you can deploy a AWS Route53 Hosted Zone to provide "nice" domain names for your workshop items. In this case, we're using `kcdc.garoyeri.dev` as the subdomain root. Substitute your own domain name if you've got one.
+
+```shell
+cd deploy
+dotnet build src
+npm run cdk -- deploy DeployDnsStack --parameters DeployDnsStack:RootDomainName=kcdc.garoyeri.dev --profile personal
+```
+
+After the stack deploys (successfully), you'll see a list of outputs:
+
+```
+DeployDnsStack.HostedZoneArn = arn:aws:route53:::hostedzone/Z08450421CUAFXM0YLX6M
+DeployDnsStack.HostedZoneId = Z08450421CUAFXM0YLX6M
+DeployDnsStack.NameServers = ns-1484.awsdns-57.org,ns-1947.awsdns-51.co.uk,ns-952.awsdns-55.net,ns-64.awsdns-08.com
+```
+
+These will be used for setting up your DNS. Go to your DNS provider and add NS records for the desired subdomain. For example on the output above, you should add the following records to your DNS provider:
+
+| Record Type | Record              | TTL    | Value                     |
+| ----------- | ------------------- | ------ | ------------------------- |
+| `NS`        | `kcdc.garoyeri.dev` | `3600` | `ns-1484.awsdns-57.org`   |
+| `NS`        | `kcdc.garoyeri.dev` | `3600` | `ns-1947.awsdns-51.co.uk` |
+| `NS`        | `kcdc.garoyeri.dev` | `3600` | `ns-952.awsdns-55.net`    |
+| `NS`        | `kcdc.garoyeri.dev` | `3600` | `ns-64.awsdns-08.com`     |
+
+Your DNS provider may represent these accounts in different ways. Usually you'll either see separate entries for each nameserver, or you'll see a single entry with 4 answers. In either case, the DNS entries will be 4 and look like the table above. You can start the TTL with 1 hour for now, then increase it later to 48 hours to reduce the amount of DNS traffic and improve caching.
+
+At this point, your DNS subdomain (`kcdc.garoyeri.dev`) is deferring to AWS to provide information on any further subdomains (such as `hello.kcdc.garoyeri.dev`).
+
+## Deploying the Hello World Web
+
+Next, we'll deploy the Hello World Web. In the following command, replace `hello.kcdc.garoyeridev` with your own desired URL, and replace `Z07391151E50793DGWFJ0` with your own Root Hosted Zone ID from the previous stack deployment.
+
+If you're not using a custom domain name, then you need to edit `Program.cs` and change the `skipCertificate: false` to `skipCertificate: true` on the  statement containing `new DeployLambdaStack`. Otherwise the deployment will fail trying to validate the certificate.
+
+```shell
+npm run cdk -- deploy DeployLambdaStack --parameters DeployLambdaStack:DomainName=hello --parameters DeployLambdaStack:RootHostedZoneId=Z07391151E50793DGWFJ0 --parameters DeployLambdaStack:RootHostedZoneName=kcdc.garoyeri.dev --profile personal
+```
+
+When you run this, it will ask you to confirm changes to IAM. These are the security settings that are created automatically by CDK when you link things together. It will configure the correct permissions for you automatically, but any changes to IAM will need to be reviewed on a deployment. If you redeploy and there are no IAM changes, then this confirmation will not appear.
+
+The outputs will include a URL that can be used instead of the custom domain name you added. So if you chose not to apply a custom domain, then use this URL. For example:
+
+```shell
+Outputs:
+DeployLambdaStack.ApiEndpoint = https://93v78n62g7.execute-api.us-east-1.amazonaws.com
+```
+
+If you decided to use a custom URL like mine (https://hello.kcdc.garoyeri.dev), then that's the base URL.
+
+Let's try one and see what happens, point your browsers to: <https://hello.kcdc.garoyeri.dev> and see what happens.
+
+![image-20210906180727544](docs/images/Hello-World-Running.png)
+
+
 
