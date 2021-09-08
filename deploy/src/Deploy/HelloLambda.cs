@@ -3,6 +3,7 @@ namespace Deploy
     using Amazon.CDK;
     using Amazon.CDK.AWS.APIGatewayv2.Integrations;
     using Amazon.CDK.AWS.Lambda;
+    using Amazon.CDK.AWS.Logs;
 
     public class HelloLambda : Construct
     {
@@ -13,6 +14,8 @@ namespace Deploy
         {
             Function = new DockerImageFunction(this, "Lambda", new DockerImageFunctionProps
             {
+                MemorySize = 256,
+                LogRetention = RetentionDays.ONE_MONTH,
                 // note: this path is relative to where CDK runs from, which would be at the `deploy` folder
                 Code = DockerImageCode.FromImageAsset(targetPath, new AssetImageCodeProps
                 {

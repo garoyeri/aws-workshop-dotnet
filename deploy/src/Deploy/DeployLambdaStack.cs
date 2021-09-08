@@ -14,10 +14,18 @@ namespace Deploy
             var lambda = new HelloLambda(this, "HelloLambda", "../src/AwsHelloWorldWeb");
             var api = new SingleLambdaApiGateway(this, "Api", domainName, rootHostedZoneId, rootHostedZoneName,
                 lambda.Integration, skipCertificate);
+            var table = new ValuesDynamoTable(this, "ValuesTable");
+
+            // allow the lambda function to use the DynamoDB table
+            table.Table.GrantFullAccess(lambda.Function);
 
             new CfnOutput(this, "ApiEndpoint", new CfnOutputProps
             {
                 Value = api.Gateway.ApiEndpoint
+            });
+            new CfnOutput(this, "Table", new CfnOutputProps
+            {
+                Value = table.Table.TableArn
             });
         }
     }

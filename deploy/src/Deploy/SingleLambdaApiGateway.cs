@@ -50,7 +50,7 @@ namespace Deploy
             Gateway.AddRoutes(new AddRoutesOptions
             {
                 Integration = integration,
-                Methods = new[] { HttpMethod.ANY },
+                Methods = new[] { HttpMethod.GET, HttpMethod.DELETE, HttpMethod.HEAD, HttpMethod.PATCH, HttpMethod.PUT, HttpMethod.POST },
                 Path = "/{proxy+}"
             });
 
