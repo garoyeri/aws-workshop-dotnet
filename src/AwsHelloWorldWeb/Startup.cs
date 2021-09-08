@@ -14,6 +14,13 @@ using Microsoft.Extensions.Logging;
 
 namespace AwsHelloWorldWeb
 {
+    using Amazon.DynamoDBv2;
+    using Amazon.DynamoDBv2.DataModel;
+    using Amazon.Runtime;
+    using Features.Values;
+    using Microsoft.Extensions.Options;
+    using Microsoft.OpenApi.Models;
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -26,7 +33,46 @@ namespace AwsHelloWorldWeb
         // This method gets called by the runtime. Use this method to add services to the container
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            var inDevelopment = Configuration.GetValue<string>("ASPNETCORE_ENVIRONMENT") == "Development";
+
+            services.AddControllers(o =>
+            {
+                o.Filters.Add<ExceptionFilter>();
+            });
+
+            if (inDevelopment)
+            {
+                services.AddSwaggerGen(c =>
+                {
+                    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Hello World Workshop", Version = "v1" });
+                });
+            }
+
+            services.Configure<Settings>(Configuration.GetSection("DynamoDB"));
+            services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
+            
+            services.AddScoped<ExceptionFilter>();
+
+            // when in local development mode, the service URL is set and SOME credentials must be provided
+            var dynamoOptions = Configuration.GetAWSOptions("DynamoDB");
+            if (dynamoOptions.DefaultClientConfig.ServiceURL == "http://localhost:8000")
+                dynamoOptions.Credentials = new BasicAWSCredentials("DUMMY", "DUMMY");
+            services.AddAWSService<IAmazonDynamoDB>(dynamoOptions);
+
+            // setup DynamoDB context, adding optional table name prefix
+            services.AddSingleton<IDynamoDBContext>(p =>
+            {
+                var options = p.GetRequiredService<IOptions<Settings>>();
+                var client = p.GetRequiredService<IAmazonDynamoDB>();
+
+                return new DynamoDBContext(client, new DynamoDBContextConfig
+                {
+                    TableNamePrefix = options.Value.TableNamePrefix,
+                    ConsistentRead = true
+                });
+            });
+
+            services.AddSingleton<ValuesService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
@@ -38,6 +84,16 @@ namespace AwsHelloWorldWeb
             }
 
             app.UseHttpsRedirection();
+            
+            // only turn Swagger on in development
+            if (env.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("v1/swagger.json", "Hello World Workshop V1");
+                });
+            }
 
             app.UseRouting();
 
