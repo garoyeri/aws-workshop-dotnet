@@ -18,6 +18,8 @@
     <PackageReference Include="Amazon.CDK.AWS.APIGatewayv2.Integrations" Version="$(CDKVersion)" />
     <PackageReference Include="Amazon.CDK.AWS.DynamoDB" Version="$(CDKVersion)" />
     <PackageReference Include="Amazon.CDK.AWS.ECR" Version="$(CDKVersion)" />
+    <PackageReference Include="Amazon.CDK.AWS.ECS" Version="$(CDKVersion)" />
+    <PackageReference Include="Amazon.CDK.AWS.ECS.Patterns" Version="$(CDKVersion)" />
     <PackageReference Include="Amazon.CDK.AWS.CertificateManager" Version="$(CDKVersion)" />
     <PackageReference Include="Amazon.CDK.ECR.Assets" Version="$(CDKVersion)" />
     <PackageReference Include="Amazon.CDK.AWS.Lambda" Version="$(CDKVersion)" />

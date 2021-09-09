@@ -5,13 +5,13 @@ namespace Deploy
 
     public class ValuesDynamoTable : Construct
     {
-        public ValuesDynamoTable(Construct scope, string id) : base(scope, id)
+        public ValuesDynamoTable(Construct scope, string id, string tablePrefix = "HelloWorldWeb") : base(scope, id)
         {
             Table = new Table(this, "Table", new TableProps
             {
                 BillingMode = BillingMode.PAY_PER_REQUEST,
                 PartitionKey = new Attribute { Name = "id", Type = AttributeType.STRING },
-                TableName = "HelloWorldWebValues"
+                TableName = $"{tablePrefix}Values"
             });
             
             Table.AddGlobalSecondaryIndex(new GlobalSecondaryIndexProps
