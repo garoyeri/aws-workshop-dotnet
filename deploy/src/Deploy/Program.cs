@@ -18,6 +18,14 @@ namespace Deploy
                     Region = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_REGION"),
                 }
             });
+            new DeployVpcStack(app, "DeployVpcStack", new StackProps
+            {
+                Env = new Amazon.CDK.Environment
+                {
+                    Account = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_ACCOUNT"),
+                    Region = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_REGION"),
+                }
+            });
             new DeployLambdaStack(app, "DeployLambdaStack",
                 // if you're not planning on using custom domains, change this to `true`
                 skipCertificate: false,

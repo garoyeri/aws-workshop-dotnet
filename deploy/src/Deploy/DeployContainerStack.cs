@@ -1,7 +1,9 @@
 namespace Deploy
 {
+    using System.Collections.Generic;
     using System.ComponentModel;
     using Amazon.CDK;
+    using Amazon.CDK.AWS.EC2;
     using Amazon.CDK.AWS.ECS;
 
     public class DeployContainerStack : Stack
@@ -11,10 +13,23 @@ namespace Deploy
             const string tableNamePrefix = "HelloContainerWeb";
             
             var domainName = new CfnParameter(this, "DomainName");
-            var rootHostedZoneId = new CfnParameter(this, "RootHostedZoneId");
-            var rootHostedZoneName = new CfnParameter(this, "RootHostedZoneName");
+            var rootHostedZoneId = Fn.ImportValue("RootDomainHostedZoneId");
+            var rootHostedZoneName = Fn.ImportValue("RootDomainHostedZoneName");
+            var vpcId = Fn.ImportValue("VpcId");
+            var availabilityZones = Fn.ImportListValue("AvailabilityZones", 2, ",");
 
-            var cluster = new Cluster(this, "Cluster");
+            var vpc = Vpc.FromLookup(this, "Vpc", new VpcLookupOptions
+            {
+                Tags = new Dictionary<string, string>
+                {
+                    { "type", "workshop-primary" }
+                }
+            });
+            
+            var cluster = new Cluster(this, "Cluster", new ClusterProps
+            {
+                Vpc = vpc
+            });
             
             var task = new HelloContainer(this, "HelloContainer", new HelloContainerProps
             {

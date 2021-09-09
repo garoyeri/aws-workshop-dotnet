@@ -3,6 +3,7 @@ namespace Deploy
     using System.Collections.Generic;
     using Amazon.CDK;
     using Amazon.CDK.AWS.CertificateManager;
+    using Amazon.CDK.AWS.EC2;
     using Amazon.CDK.AWS.Ecr.Assets;
     using Amazon.CDK.AWS.ECS;
     using Amazon.CDK.AWS.ECS.Patterns;
@@ -12,12 +13,13 @@ namespace Deploy
     {
         public ICluster Cluster { get; set; }
         public CfnParameter DomainName { get; set; }
-        public CfnParameter RootHostedZoneId { get; set; }
-        public CfnParameter RootHostedZoneName { get; set; }
+        public string RootHostedZoneId { get; set; }
+        public string RootHostedZoneName { get; set; }
         public string TargetPath { get; set; }
         public string Dockerfile { get; set; } = "Dockerfile";
         public bool SkipCertificate { get; set; } = false;
         public string TableNamePrefix = "";
+        public IVpc Vpc = null;
     }
 
     public class HelloContainer : Construct
@@ -28,12 +30,12 @@ namespace Deploy
 
         public HelloContainer(Construct scope, string id, HelloContainerProps props) : base(scope, id)
         {
-            var fullDomainName = $"{props.DomainName.ValueAsString}.{props.RootHostedZoneName.ValueAsString}";
+            var fullDomainName = $"{props.DomainName.ValueAsString}.{props.RootHostedZoneName}";
 
             Zone = HostedZone.FromHostedZoneAttributes(this, "RootHostedZone", new HostedZoneAttributes
             {
-                ZoneName = props.RootHostedZoneName.ValueAsString,
-                HostedZoneId = props.RootHostedZoneId.ValueAsString
+                ZoneName = props.RootHostedZoneName,
+                HostedZoneId = props.RootHostedZoneId
             });
             Certificate = props.SkipCertificate ? null : new Certificate(this, "Certificate", new DnsValidatedCertificateProps
             {
@@ -52,14 +54,15 @@ namespace Deploy
                 {
                     Certificate = Certificate,
                     Cluster = props.Cluster,
-                    Cpu = 1024,
+                    Cpu = 256,
                     MemoryLimitMiB = 512,
                     DomainZone = Zone,
                     DomainName = fullDomainName,
+                    Vpc = props.Vpc,
                     TaskImageOptions = new ApplicationLoadBalancedTaskImageOptions
                     {
                         Image = ContainerImage.FromDockerImageAsset(image),
-                        ContainerName = "web",
+                        ContainerName = "Web",
                         Environment = new Dictionary<string, string>
                         {
                             // override the dynamodb prefix
