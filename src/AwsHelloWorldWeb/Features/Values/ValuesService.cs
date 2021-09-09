@@ -21,11 +21,24 @@ namespace AwsHelloWorldWeb.Features.Values
         public static string GenerateHashKey(int id) => $"value|{id}";
         public static int ExtractId(string hashKey) => int.Parse(hashKey.Split("|").Last());
 
+        /// <summary>
+        /// Get the value by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public Task<ValueItem> Get(int id, CancellationToken cancellationToken = default)
         {
             return _context.LoadAsync<ValueItem>(GenerateHashKey(id), cancellationToken);
         }
 
+        /// <summary>
+        /// List the values in ID order
+        /// </summary>
+        /// <param name="maxItems"></param>
+        /// <param name="useBackwardQuery"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task<List<ValueItem>> List(int maxItems = 100, bool? useBackwardQuery = null, CancellationToken cancellationToken = default)
         {
             maxItems = Math.Clamp(maxItems, 1, 100);
@@ -44,6 +57,12 @@ namespace AwsHelloWorldWeb.Features.Values
             return await search.GetRemainingAsync(cancellationToken);
         }
 
+        /// <summary>
+        /// Append a new value as the next ID
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task<ValueItem> Append(string value, CancellationToken cancellationToken = default)
         {
             var latest = await _context.LoadAsync<ValueItem>(LatestIdHashKey, cancellationToken);
@@ -67,6 +86,13 @@ namespace AwsHelloWorldWeb.Features.Values
             return newItem;
         }
 
+        /// <summary>
+        /// Insert or update a value by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="value"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task<ValueItem> Upsert(int id, string value, CancellationToken cancellationToken = default)
         {
             var item = new ValueItem(id, value);
@@ -75,6 +101,12 @@ namespace AwsHelloWorldWeb.Features.Values
             return item;
         }
 
+        /// <summary>
+        /// Delete the specified value by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public Task Delete(int id, CancellationToken cancellationToken = default)
         {
             return _context.DeleteAsync<ValueItem>(GenerateHashKey(id), cancellationToken);
