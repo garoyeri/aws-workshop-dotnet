@@ -8,12 +8,18 @@ namespace Deploy
             base(scope, id, props)
         {
             var domainName = new CfnParameter(this, "DomainName");
-            var rootHostedZoneId = new CfnParameter(this, "RootHostedZoneId");
-            var rootHostedZoneName = new CfnParameter(this, "RootHostedZoneName");
+            var rootHostedZoneId = Fn.ImportValue("RootDomainHostedZoneId");
+            var rootHostedZoneName = Fn.ImportValue("RootDomainHostedZoneName");
 
             var lambda = new HelloLambda(this, "HelloLambda", "../src/AwsHelloWorldWeb");
-            var api = new SingleLambdaApiGateway(this, "Api", domainName, rootHostedZoneId, rootHostedZoneName,
-                lambda.Integration, skipCertificate);
+            var api = new SingleLambdaApiGateway(this, "Api", new SingleLambdaApiGatewayProps
+            {
+                DomainName = domainName,
+                RootHostedZoneId = rootHostedZoneId,
+                RootHostedZoneName = rootHostedZoneName,
+                Integration = lambda.Integration,
+                SkipCertificate = skipCertificate
+            });
             var table = new ValuesDynamoTable(this, "ValuesTable");
 
             // allow the lambda function to use the DynamoDB table
