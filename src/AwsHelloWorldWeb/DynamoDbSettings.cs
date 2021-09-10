@@ -1,8 +1,9 @@
 namespace AwsHelloWorldWeb
 {
-    public class Settings
+    public class DynamoDbSettings
     {
         public string TableNamePrefix { get; set; }
         public string DynamoDbUrl { get; set; }
     }
+
 }

@@ -21,9 +21,9 @@ namespace AwsHelloWorldWeb.Tests
             Configuration = Factory.Services.GetRequiredService<IConfiguration>();
             ScopeFactory = Factory.Services.GetRequiredService<IServiceScopeFactory>();
 
-            Settings = Factory.Services.GetRequiredService<IOptions<Settings>>().Value;
+            DynamoDbSettings = Factory.Services.GetRequiredService<IOptions<DynamoDbSettings>>().Value;
             Client = Factory.Services.GetRequiredService<IAmazonDynamoDB>();
-            Values = Factory.Services.GetRequiredService<ValuesService>();
+            Values = Factory.Services.GetRequiredService<ValuesServiceDynamoDb>();
         }
         
         public class TestApplicationFactory : WebApplicationFactory<Startup>
@@ -45,10 +45,10 @@ namespace AwsHelloWorldWeb.Tests
         public IConfiguration Configuration;
         public IServiceScopeFactory ScopeFactory;
 
-        public Settings Settings { get; }
+        public DynamoDbSettings DynamoDbSettings { get; }
         public IAmazonDynamoDB Client { get; }
         
-        public ValuesService Values { get; }
+        public ValuesServiceDynamoDb Values { get; }
         
         /// <summary>
         /// Create the tables in DynamoDB
@@ -57,7 +57,7 @@ namespace AwsHelloWorldWeb.Tests
         public async Task CreateTables()
         {
             // create the Values table
-            var valuesTableName = Settings.TableNamePrefix + "Values";
+            var valuesTableName = DynamoDbSettings.TableNamePrefix + "Values";
             if (await WaitForTable(valuesTableName, retries: 1) != null)
             {
                 await Client.DeleteTableAsync(valuesTableName);

@@ -15,7 +15,7 @@ namespace AwsHelloWorldWeb.Features.Values
 
         public ValueItem(int id, string value) : this()
         {
-            Id = ValuesService.GenerateHashKey(id);
+            Id = ValuesServiceDynamoDb.GenerateHashKey(id);
             Value = value;
         }
 

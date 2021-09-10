@@ -48,7 +48,7 @@ namespace AwsHelloWorldWeb
                 });
             }
 
-            services.Configure<Settings>(Configuration.GetSection("DynamoDB"));
+            services.Configure<DynamoDbSettings>(Configuration.GetSection("DynamoDB"));
             services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
             
             services.AddScoped<ExceptionFilter>();
@@ -62,7 +62,7 @@ namespace AwsHelloWorldWeb
             // setup DynamoDB context, adding optional table name prefix
             services.AddSingleton<IDynamoDBContext>(p =>
             {
-                var options = p.GetRequiredService<IOptions<Settings>>();
+                var options = p.GetRequiredService<IOptions<DynamoDbSettings>>();
                 var client = p.GetRequiredService<IAmazonDynamoDB>();
 
                 return new DynamoDBContext(client, new DynamoDBContextConfig
@@ -72,7 +72,7 @@ namespace AwsHelloWorldWeb
                 });
             });
 
-            services.AddSingleton<ValuesService>();
+            services.AddSingleton<ValuesServiceDynamoDb>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline

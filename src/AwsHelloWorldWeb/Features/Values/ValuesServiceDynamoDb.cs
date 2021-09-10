@@ -8,11 +8,11 @@ namespace AwsHelloWorldWeb.Features.Values
     using Amazon.DynamoDBv2.DataModel;
     using Amazon.DynamoDBv2.DocumentModel;
 
-    public class ValuesService
+    public class ValuesServiceDynamoDb : IValuesService
     {
         private readonly IDynamoDBContext _context;
 
-        public ValuesService(IDynamoDBContext context)
+        public ValuesServiceDynamoDb(IDynamoDBContext context)
         {
             _context = context;
         }

@@ -8,9 +8,9 @@
     [Route("api/[controller]")]
     public class ValuesController : ControllerBase
     {
-        private readonly ValuesService _values;
+        private readonly ValuesServiceDynamoDb _values;
 
-        public ValuesController(ValuesService values)
+        public ValuesController(ValuesServiceDynamoDb values)
         {
             _values = values;
         }
