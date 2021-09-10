@@ -158,9 +158,7 @@ At this point, your DNS subdomain (`kcdc.garoyeri.dev`) is deferring to AWS to p
 
 ## Deploying the Hello World Web
 
-Next, we'll deploy the Hello World Web. In the following command, replace `hello.kcdc.garoyeridev` with your own desired URL, and replace `Z07391151E50793DGWFJ0` with your own Root Hosted Zone ID from the previous stack deployment.
-
-If you're not using a custom domain name, then you need to edit `Program.cs` and change the `skipCertificate: false` to `skipCertificate: true` on the  statement containing `new DeployLambdaStack`. Otherwise the deployment will fail trying to validate the certificate.
+Next, we'll deploy the Hello World Web. If you're not using a custom domain name, then you need to edit `Program.cs` and change the `skipCertificate: false` to `skipCertificate: true` on the  statement containing `new DeployLambdaStack`. Otherwise the deployment will fail trying to validate the certificate.
 
 ```shell
 npm run cdk -- deploy DeployLambdaStack --parameters DeployLambdaStack:DomainName=hello --parameters DeployLambdaStack:RootHostedZoneId=Z07391151E50793DGWFJ0 --parameters DeployLambdaStack:RootHostedZoneName=kcdc.garoyeri.dev --profile personal
