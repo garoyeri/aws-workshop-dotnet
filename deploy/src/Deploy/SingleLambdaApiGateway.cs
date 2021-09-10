@@ -7,41 +7,47 @@ namespace Deploy
     using Amazon.CDK.AWS.Route53;
     using Amazon.CDK.AWS.Route53.Targets;
 
+    public class SingleLambdaApiGatewayProps
+    {
+        public CfnParameter DomainName { get; set; }
+        public string RootHostedZoneId { get; set; }
+        public string RootHostedZoneName { get; set; }
+        public LambdaProxyIntegration Integration { get; set; }
+        public string NamePrefix { get; set; } = "HelloWorldWebLambda";
+        public bool SkipCertificate { get; set; } = false;
+    }
+
     public class SingleLambdaApiGateway : Construct
     {
         public IHostedZone Zone { get; }
         public Certificate Certificate { get; }
         public HttpApi Gateway { get; }
 
-        public SingleLambdaApiGateway(Construct scope, string id,
-            CfnParameter domainName, string rootHostedZoneId,
-            string rootHostedZoneName,
-            LambdaProxyIntegration integration,
-            bool skipCertificate = false) : base(scope, id)
+        public SingleLambdaApiGateway(Construct scope, string id, SingleLambdaApiGatewayProps singleLambdaApiGatewayProps) : base(scope, id)
         {
-            var fullDomainName = $"{domainName.ValueAsString}.{rootHostedZoneName}";
+            var fullDomainName = $"{singleLambdaApiGatewayProps.DomainName.ValueAsString}.{singleLambdaApiGatewayProps.RootHostedZoneName}";
 
             Zone = HostedZone.FromHostedZoneAttributes(this, "RootHostedZone", new HostedZoneAttributes
             {
-                ZoneName = rootHostedZoneName,
-                HostedZoneId = rootHostedZoneId
+                ZoneName = singleLambdaApiGatewayProps.RootHostedZoneName,
+                HostedZoneId = singleLambdaApiGatewayProps.RootHostedZoneId
             });
 
-            Certificate = skipCertificate ? null : new Certificate(this, "Certificate", new DnsValidatedCertificateProps
+            Certificate = singleLambdaApiGatewayProps.SkipCertificate ? null : new Certificate(this, "Certificate", new DnsValidatedCertificateProps
             {
                 DomainName = fullDomainName,
                 HostedZone = Zone,
                 Validation = CertificateValidation.FromDns(Zone)
             });
-            var domain = skipCertificate ? null : new DomainName(this, "CustomDomain", new DomainNameProps
+            var domain = singleLambdaApiGatewayProps.SkipCertificate ? null : new DomainName(this, "CustomDomain", new DomainNameProps
             {
                 DomainName = fullDomainName,
                 Certificate = Certificate
             });
             Gateway = new HttpApi(this, "Gateway", new HttpApiProps
             {
-                ApiName = "HelloWorldWebLambdaApi",
-                DefaultDomainMapping = skipCertificate ? null : new DomainMappingOptions
+                ApiName = $"{singleLambdaApiGatewayProps.NamePrefix}Api",
+                DefaultDomainMapping = singleLambdaApiGatewayProps.SkipCertificate ? null : new DomainMappingOptions
                 {
                     DomainName = domain
                 }
@@ -49,14 +55,14 @@ namespace Deploy
 
             Gateway.AddRoutes(new AddRoutesOptions
             {
-                Integration = integration,
+                Integration = singleLambdaApiGatewayProps.Integration,
                 Methods = new[] { HttpMethod.GET, HttpMethod.DELETE, HttpMethod.HEAD, HttpMethod.PATCH, HttpMethod.PUT, HttpMethod.POST },
                 Path = "/{proxy+}"
             });
 
-            var dnsRecord = skipCertificate ? null : new ARecord(this, "CustomAliasRecord", new ARecordProps
+            var dnsRecord = singleLambdaApiGatewayProps.SkipCertificate ? null : new ARecord(this, "CustomAliasRecord", new ARecordProps
             {
-                RecordName = domainName.ValueAsString,
+                RecordName = singleLambdaApiGatewayProps.DomainName.ValueAsString,
                 Zone = Zone,
                 Target = RecordTarget.FromAlias(
                     new ApiGatewayv2DomainProperties(domain.RegionalDomainName, domain.RegionalHostedZoneId))
