@@ -7,6 +7,12 @@
       "commands": [
         "dotnet-lambda"
       ]
+    },
+    "dotnet-ef": {
+      "version": "5.0.9",
+      "commands": [
+        "dotnet-ef"
+      ]
     }
   }
 }

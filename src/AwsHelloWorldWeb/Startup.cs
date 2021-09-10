@@ -17,7 +17,9 @@ namespace AwsHelloWorldWeb
     using Amazon.DynamoDBv2;
     using Amazon.DynamoDBv2.DataModel;
     using Amazon.Runtime;
+    using Database;
     using Features.Values;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Options;
     using Microsoft.OpenApi.Models;
 
@@ -71,8 +73,14 @@ namespace AwsHelloWorldWeb
                     ConsistentRead = true
                 });
             });
-
+            
             services.AddSingleton<ValuesServiceDynamoDb>();
+            
+            // relational database support
+            services.AddDbContext<ValuesContext>(o =>
+            {
+                o.UseNpgsql(Configuration.GetConnectionString("Database"));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
