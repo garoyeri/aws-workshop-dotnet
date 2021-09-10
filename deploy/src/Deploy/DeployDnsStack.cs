@@ -27,6 +27,12 @@ namespace Deploy
                 ExportName = "RootDomainHostedZoneId",
                 Value = hostedZone.HostedZoneId
             });
+            // output the hosted zone name so we can use elsewhere
+            new CfnOutput(this, "HostedZoneName", new CfnOutputProps
+            {
+                ExportName = "RootDomainHostedZoneName",
+                Value = hostedZone.ZoneName
+            });
             // output the ARN too in case that's useful to have instead (usually not)
             new CfnOutput(this, "HostedZoneArn", new CfnOutputProps
             {
