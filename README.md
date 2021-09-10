@@ -126,6 +126,8 @@ The rest of the instructions assume that you've got an AWS account setup already
 
 ## Deploying DNS
 
+Checkout the `main` branch first.
+
 If you have a domain name handy, you can deploy a AWS Route53 Hosted Zone to provide "nice" domain names for your workshop items. In this case, we're using `kcdc.garoyeri.dev` as the subdomain root. Substitute your own domain name if you've got one.
 
 ```shell
@@ -158,11 +160,17 @@ At this point, your DNS subdomain (`kcdc.garoyeri.dev`) is deferring to AWS to p
 
 ## Deploying the Hello World Web
 
-Next, we'll deploy the Hello World Web. If you're not using a custom domain name, then you need to edit `Program.cs` and change the `skipCertificate: false` to `skipCertificate: true` on the  statement containing `new DeployLambdaStack`. Otherwise the deployment will fail trying to validate the certificate.
+Next, we'll deploy the Hello World Web. Checkout the branch `workshop/01-hello-world-web`.
+
+If you're not using a custom domain name, then you need to edit [`deploy/src/Deploy/Program.cs`](deploy/src/Deploy/Program.cs) and change the `skipCertificate: false` to `skipCertificate: true` on the  statement containing `new DeployLambdaStack`. Otherwise the deployment will fail trying to validate the certificate.
+
+Deploy using the following command:
 
 ```shell
-npm run cdk -- deploy DeployLambdaStack --parameters DeployLambdaStack:DomainName=hello --parameters DeployLambdaStack:RootHostedZoneId=Z07391151E50793DGWFJ0 --parameters DeployLambdaStack:RootHostedZoneName=kcdc.garoyeri.dev --profile personal
+npm run cdk -- deploy DeployLambdaStack --parameters DeployLambdaStack:DomainName=hello --profile personal
 ```
+
+The `DeployLambdaStack:DomainName=hello` entry is the subdomain from the root domain you want to use. The stacks use values from each other so you don't have to re-enter items that don't need to be re-entered.
 
 When you run this, it will ask you to confirm changes to IAM. These are the security settings that are created automatically by CDK when you link things together. It will configure the correct permissions for you automatically, but any changes to IAM will need to be reviewed on a deployment. If you redeploy and there are no IAM changes, then this confirmation will not appear.
 
@@ -180,6 +188,8 @@ Let's try one and see what happens, point your browsers to: <https://hello.kcdc.
 ![image-20210906180727544](docs/images/Hello-World-Running.png)
 
 ## Adding DynamoDB
+
+Checkout the branch `workshop/02-hello-dynamo`.
 
 DynamoDB is a NoSQL database hosted by AWS and secured using AWS IAM. It has some quirks in how you do table design (but that's a completely separate topic and you can start on Twitter here: [@dynamodb](https://twitter.com/dynamodb) where there are a LOT of examples and links to webinars about how to design tables for DynamoDB).
 
@@ -262,9 +272,9 @@ When the application is deployed to AWS, the Swagger document and UI pages are n
 
 ### Local Integration Testing
 
-The test project was updated to create a test fixture that will create the necesarry table in a local DynamoDB to run the unit tests against a real database.
+The test project was updated to create a test fixture that will create the necesarry table in a local DynamoDB to run the unit tests against a real database. These are handled by the `test/AwsHelloWorldWeb.Tests/IntegrationFixture.cs` file and are created once per test collection. This will create the DynamoDB schema (deleting the old one) and let you run tests against the database.
 
-### Deployment
+### Database Permissions
 
 We're still deploying at a Lambda + API Gateway, but also adding the DynamoDB table that's created. We will use the CDK `Table` item to create the DynamoDB table and the Global Secondary Index we'll need to get a sorted list.
 
@@ -273,4 +283,37 @@ After the table is defined, we need to make sure the Lambda is allowed to query 
 ```csharp
 table.Table.GrantFullAccess(lambda.Function);
 ```
+
+### OK Really Deploy It
+
+Use this command to deploy the example from the `deploy` folder:
+
+```shell
+npm run cdk -- deploy DeployLambdaStack --profile personal
+```
+
+This assumes you've deployed the Lambda in the previous step. If you didn't, you'll need to pass the same `--parameters DeployLambdaStack:DomainName=hello` argument to set the parameter.
+
+This will process any updates to the API Gateway and Lambda, then add the DynamoDB table and appropriate permissions.
+
+## Containerized Application on Fargate
+
+The next step is to explore the containerized application on AWS Fargate. So far, we've deployed Lambas, but the next step is more common for heavier ASP.NET Core applications, and anything that uses Razor pages. The Lambda approach works well for APIs, but not full websites that would benefit from more in-process caching.
+
+Checkout the branch `workshop/03-hello-container`. We need to deploy two things here: the VPC and the container application. Use the following commands:
+
+```shell
+npm run cdk -- deploy DeployVpcStack --profile personal
+npm run cdk -- deploy DeployContainerStack --parameters DeployContainerStack:DomainName=hello-container --profile personal
+```
+
+This will deploy an application and the outputs will include the DNS name and the Load Balancer URL (again, in case you didn't setup a domain name):
+
+```shell
+Outputs:
+DeployContainerStack.HelloContainerServiceLoadBalancerDNS8D6004C8 = Deplo-Hello-P15QD5D8MZ50-660410385.us-east-1.elb.amazonaws.com
+DeployContainerStack.HelloContainerServiceServiceURLBB0F4736 = https://hello-container.kcdc.garoyeri.dev
+```
+
+
 
