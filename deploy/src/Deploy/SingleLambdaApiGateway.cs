@@ -14,17 +14,17 @@ namespace Deploy
         public HttpApi Gateway { get; }
 
         public SingleLambdaApiGateway(Construct scope, string id,
-            CfnParameter domainName, CfnParameter rootHostedZoneId,
-            CfnParameter rootHostedZoneName,
+            CfnParameter domainName, string rootHostedZoneId,
+            string rootHostedZoneName,
             LambdaProxyIntegration integration,
             bool skipCertificate = false) : base(scope, id)
         {
-            var fullDomainName = $"{domainName.ValueAsString}.{rootHostedZoneName.ValueAsString}";
+            var fullDomainName = $"{domainName.ValueAsString}.{rootHostedZoneName}";
 
             Zone = HostedZone.FromHostedZoneAttributes(this, "RootHostedZone", new HostedZoneAttributes
             {
-                ZoneName = rootHostedZoneName.ValueAsString,
-                HostedZoneId = rootHostedZoneId.ValueAsString
+                ZoneName = rootHostedZoneName,
+                HostedZoneId = rootHostedZoneId
             });
 
             Certificate = skipCertificate ? null : new Certificate(this, "Certificate", new DnsValidatedCertificateProps
@@ -50,7 +50,7 @@ namespace Deploy
             Gateway.AddRoutes(new AddRoutesOptions
             {
                 Integration = integration,
-                Methods = new[] { HttpMethod.ANY },
+                Methods = new[] { HttpMethod.GET, HttpMethod.DELETE, HttpMethod.HEAD, HttpMethod.PATCH, HttpMethod.PUT, HttpMethod.POST },
                 Path = "/{proxy+}"
             });
 
