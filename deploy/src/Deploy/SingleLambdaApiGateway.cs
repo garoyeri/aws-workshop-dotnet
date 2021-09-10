@@ -23,31 +23,31 @@ namespace Deploy
         public Certificate Certificate { get; }
         public HttpApi Gateway { get; }
 
-        public SingleLambdaApiGateway(Construct scope, string id, SingleLambdaApiGatewayProps singleLambdaApiGatewayProps) : base(scope, id)
+        public SingleLambdaApiGateway(Construct scope, string id, SingleLambdaApiGatewayProps props) : base(scope, id)
         {
-            var fullDomainName = $"{singleLambdaApiGatewayProps.DomainName.ValueAsString}.{singleLambdaApiGatewayProps.RootHostedZoneName}";
+            var fullDomainName = $"{props.DomainName.ValueAsString}.{props.RootHostedZoneName}";
 
             Zone = HostedZone.FromHostedZoneAttributes(this, "RootHostedZone", new HostedZoneAttributes
             {
-                ZoneName = singleLambdaApiGatewayProps.RootHostedZoneName,
-                HostedZoneId = singleLambdaApiGatewayProps.RootHostedZoneId
+                ZoneName = props.RootHostedZoneName,
+                HostedZoneId = props.RootHostedZoneId
             });
 
-            Certificate = singleLambdaApiGatewayProps.SkipCertificate ? null : new Certificate(this, "Certificate", new DnsValidatedCertificateProps
+            Certificate = props.SkipCertificate ? null : new Certificate(this, "Certificate", new DnsValidatedCertificateProps
             {
                 DomainName = fullDomainName,
                 HostedZone = Zone,
                 Validation = CertificateValidation.FromDns(Zone)
             });
-            var domain = singleLambdaApiGatewayProps.SkipCertificate ? null : new DomainName(this, "CustomDomain", new DomainNameProps
+            var domain = props.SkipCertificate ? null : new DomainName(this, "CustomDomain", new DomainNameProps
             {
                 DomainName = fullDomainName,
                 Certificate = Certificate
             });
             Gateway = new HttpApi(this, "Gateway", new HttpApiProps
             {
-                ApiName = $"{singleLambdaApiGatewayProps.NamePrefix}Api",
-                DefaultDomainMapping = singleLambdaApiGatewayProps.SkipCertificate ? null : new DomainMappingOptions
+                ApiName = $"{props.NamePrefix}Api",
+                DefaultDomainMapping = props.SkipCertificate ? null : new DomainMappingOptions
                 {
                     DomainName = domain
                 }
@@ -55,14 +55,14 @@ namespace Deploy
 
             Gateway.AddRoutes(new AddRoutesOptions
             {
-                Integration = singleLambdaApiGatewayProps.Integration,
+                Integration = props.Integration,
                 Methods = new[] { HttpMethod.GET, HttpMethod.DELETE, HttpMethod.HEAD, HttpMethod.PATCH, HttpMethod.PUT, HttpMethod.POST },
                 Path = "/{proxy+}"
             });
 
-            var dnsRecord = singleLambdaApiGatewayProps.SkipCertificate ? null : new ARecord(this, "CustomAliasRecord", new ARecordProps
+            var dnsRecord = props.SkipCertificate ? null : new ARecord(this, "CustomAliasRecord", new ARecordProps
             {
-                RecordName = singleLambdaApiGatewayProps.DomainName.ValueAsString,
+                RecordName = props.DomainName.ValueAsString,
                 Zone = Zone,
                 Target = RecordTarget.FromAlias(
                     new ApiGatewayv2DomainProperties(domain.RegionalDomainName, domain.RegionalHostedZoneId))
