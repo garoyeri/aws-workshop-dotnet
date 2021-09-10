@@ -139,6 +139,7 @@ After the stack deploys (successfully), you'll see a list of outputs:
 ```
 DeployDnsStack.HostedZoneArn = arn:aws:route53:::hostedzone/Z08450421CUAFXM0YLX6M
 DeployDnsStack.HostedZoneId = Z08450421CUAFXM0YLX6M
+DeployDnsStack.HostedZoneName = kcdc.garoyeri.dev
 DeployDnsStack.NameServers = ns-1484.awsdns-57.org,ns-1947.awsdns-51.co.uk,ns-952.awsdns-55.net,ns-64.awsdns-08.com
 ```
 
