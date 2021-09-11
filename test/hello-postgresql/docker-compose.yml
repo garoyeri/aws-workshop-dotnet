@@ -3,7 +3,6 @@ version: '3.8'
 services:
   db:
     image: postgres:12
-    restart: always
     environment:
       POSTGRES_PASSWORD: postgresqlpassword
     ports:
