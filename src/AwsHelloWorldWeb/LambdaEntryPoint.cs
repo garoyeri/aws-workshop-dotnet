@@ -55,19 +55,7 @@ namespace AwsHelloWorldWeb
         protected override IHostBuilder CreateHostBuilder()
         {
             return base.CreateHostBuilder()
-                .ConfigureAppConfiguration((hostingContext, config) =>
-                {
-                    // if there is a secrets ARN configured AND we're not in development mode,
-                    //  pull the secrets from the secrets manager
-                    var secretsArn = config.Build().GetValue<string>("Database:ConnectionSecretArn");
-                    if (secretsArn != null && !hostingContext.HostingEnvironment.IsDevelopment())
-                    {
-                        config.AddSecretsManager(configurator: options =>
-                        {
-                            options.AcceptedSecretArns = new List<string> { secretsArn };
-                        });
-                    }
-                });
+                .ConfigureAppConfiguration(Extensions.ConfigureSecrets);
         }
     }
 }

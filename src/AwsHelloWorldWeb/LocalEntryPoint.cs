@@ -21,20 +21,7 @@ namespace AwsHelloWorldWeb
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((hostingContext, config) =>
-                {
-                    // if there is a secrets ARN configured AND we're not in development mode,
-                    //  pull the secrets from the secrets manager
-                    var secretsArn = config.Build().GetValue<string>("Database:ConnectionSecretArn");
-                    if (secretsArn != null && !hostingContext.HostingEnvironment.IsDevelopment())
-                    {
-                        config.AddSecretsManager(configurator: options =>
-                        {
-                            options.AcceptedSecretArns = new List<string> { secretsArn };
-                        });
-                    }
-
-                })
+                .ConfigureAppConfiguration(Extensions.ConfigureSecrets)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

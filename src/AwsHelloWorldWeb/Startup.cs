@@ -21,6 +21,7 @@ namespace AwsHelloWorldWeb
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Options;
     using Microsoft.OpenApi.Models;
+    using Npgsql;
 
     public class Startup
     {
@@ -84,7 +85,15 @@ namespace AwsHelloWorldWeb
                 // relational database support
                 services.AddDbContext<ValuesContext>(o =>
                 {
-                    o.UseNpgsql(Configuration.GetConnectionString("Database"));
+                    // override the connection string with values from the secrets / configuration
+                    var settings = Configuration.GetSection("Database").Get<DatabaseSettings>();
+                    var connectionString =
+                        new NpgsqlConnectionStringBuilder(Configuration.GetConnectionString("Database"));
+                    connectionString.Host = settings.Hostname ?? connectionString.Host;
+                    connectionString.Username = settings.Username ?? connectionString.Username;
+                    connectionString.Password = settings.Password ?? connectionString.Password;
+                    
+                    o.UseNpgsql(connectionString.ToString());
                 });
 
                 services.AddScoped<IValuesService, DatabaseValuesService>();
