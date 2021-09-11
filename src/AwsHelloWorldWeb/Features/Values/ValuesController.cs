@@ -22,7 +22,7 @@
         }
 
         // GET api/values/5
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<string>> Get(int id)
         {
             var found = await _values.Get(id);
@@ -42,7 +42,7 @@
         }
 
         // PUT api/values/5
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<ActionResult> Put(int id, [FromBody]string value)
         {
             await _values.Upsert(id, value);
@@ -51,7 +51,7 @@
         }
 
         // DELETE api/values/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
             await _values.Delete(id);

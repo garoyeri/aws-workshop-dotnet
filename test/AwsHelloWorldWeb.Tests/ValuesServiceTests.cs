@@ -17,9 +17,12 @@ namespace AwsHelloWorldWeb.Tests
         [Fact]
         public async Task CanCreateValues()
         {
-            await _fixture.Values.Append("CanCreateValues()");
-            var values = await _fixture.Values.List();
-            values.ShouldContain(v => v == "CanCreateValues()");
+            await _fixture.UsingValuesServiceAsync(async service =>
+            {
+                await service.Append("CanCreateValues()");
+                var values = await service.List();
+                values.ShouldContain(v => v == "CanCreateValues()");
+            });
         }
     }
 }

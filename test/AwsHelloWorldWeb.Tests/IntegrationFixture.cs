@@ -8,6 +8,7 @@ namespace AwsHelloWorldWeb.Tests
     using Features.Values;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.Testing;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
@@ -20,10 +21,20 @@ namespace AwsHelloWorldWeb.Tests
             Factory = new TestApplicationFactory();
             Configuration = Factory.Services.GetRequiredService<IConfiguration>();
             ScopeFactory = Factory.Services.GetRequiredService<IServiceScopeFactory>();
-
-            DynamoDbSettings = Factory.Services.GetRequiredService<IOptions<DynamoDbSettings>>().Value;
-            Client = Factory.Services.GetRequiredService<IAmazonDynamoDB>();
-            Values = Factory.Services.GetRequiredService<DynamoDbValuesService>();
+            
+            Mode = Configuration.GetValue<PersistenceMode>("Database:PersistenceMode");
+            if (Mode == PersistenceMode.DynamoDb)
+            {
+                DynamoDbSettings = Factory.Services.GetRequiredService<IOptions<DynamoDbSettings>>().Value;
+                Client = Factory.Services.GetRequiredService<IAmazonDynamoDB>();
+                CreateTables().GetAwaiter().GetResult();
+            }
+            else if (Mode == PersistenceMode.Database)
+            {
+                using var scope = ScopeFactory.CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<ValuesContext>();
+                context.Database.Migrate();
+            }
         }
         
         public class TestApplicationFactory : WebApplicationFactory<Startup>
@@ -44,12 +55,40 @@ namespace AwsHelloWorldWeb.Tests
         public TestApplicationFactory Factory;
         public IConfiguration Configuration;
         public IServiceScopeFactory ScopeFactory;
+        public PersistenceMode Mode { get; }
 
         public DynamoDbSettings DynamoDbSettings { get; }
         public IAmazonDynamoDB Client { get; }
-        
-        public DynamoDbValuesService Values { get; }
-        
+
+        public async Task UsingValuesServiceAsync(Func<IValuesService, Task> action)
+        {
+            using var scope = ScopeFactory.CreateScope();
+
+            if (Mode == PersistenceMode.Database)
+            {
+                var context = scope.ServiceProvider.GetRequiredService<ValuesContext>();
+
+                try
+                {
+                    await context.BeginTransactionAsync();
+
+                    var service = scope.ServiceProvider.GetRequiredService<IValuesService>();
+                    await action(service);
+
+                    await context.CommitTransactionAsync();
+                }
+                catch
+                {
+                    context.RollbackTransaction();
+                }
+            }
+            else
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IValuesService>();
+                await action(service);
+            }
+        }
+
         /// <summary>
         /// Create the tables in DynamoDB
         /// </summary>
