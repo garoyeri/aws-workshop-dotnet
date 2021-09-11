@@ -4,24 +4,24 @@ namespace AwsHelloWorldWeb.Features.Values
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class ValuesServiceRdbms : IValuesService
+    public class DatabaseValuesService : IValuesService
     {
-        public Task<ValueItem> Get(int id, CancellationToken cancellationToken = default)
+        public Task<string> Get(int id, CancellationToken cancellationToken = default)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<List<ValueItem>> List(int maxItems = 100, bool? useBackwardQuery = null, CancellationToken cancellationToken = default)
+        public Task<List<string>> List(int maxItems = 100, bool? useBackwardQuery = null, CancellationToken cancellationToken = default)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<ValueItem> Append(string value, CancellationToken cancellationToken = default)
+        public Task Append(string value, CancellationToken cancellationToken = default)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<ValueItem> Upsert(int id, string value, CancellationToken cancellationToken = default)
+        public Task Upsert(int id, string value, CancellationToken cancellationToken = default)
         {
             throw new System.NotImplementedException();
         }

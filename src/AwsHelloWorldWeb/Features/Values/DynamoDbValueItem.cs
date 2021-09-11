@@ -3,23 +3,23 @@ namespace AwsHelloWorldWeb.Features.Values
     using Amazon.DynamoDBv2.DataModel;
 
     [DynamoDBTable("Values", lowerCamelCaseProperties: true)]
-    public class ValueItem
+    public class DynamoDbValueItem
     {
         public const string DummyValue = "1";
         public const string SortedIndex = "SortedIndex";
 
-        public ValueItem()
+        public DynamoDbValueItem()
         {
             Dummy = DummyValue;
         }
 
-        public ValueItem(int id, string value) : this()
+        public DynamoDbValueItem(int id, string value) : this()
         {
-            Id = ValuesServiceDynamoDb.GenerateHashKey(id);
+            Id = DynamoDbValuesService.GenerateHashKey(id);
             Value = value;
         }
 
-        public ValueItem(string hashId, string value) : this()
+        public DynamoDbValueItem(string hashId, string value) : this()
         {
             Id = hashId;
             Value = value;

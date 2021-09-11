@@ -19,7 +19,7 @@ namespace AwsHelloWorldWeb.Tests
         {
             await _fixture.Values.Append("CanCreateValues()");
             var values = await _fixture.Values.List();
-            values.ShouldContain(v => v.Value == "CanCreateValues()");
+            values.ShouldContain(v => v == "CanCreateValues()");
         }
     }
 }

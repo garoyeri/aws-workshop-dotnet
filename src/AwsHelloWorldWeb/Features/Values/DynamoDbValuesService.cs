@@ -8,11 +8,11 @@ namespace AwsHelloWorldWeb.Features.Values
     using Amazon.DynamoDBv2.DataModel;
     using Amazon.DynamoDBv2.DocumentModel;
 
-    public class ValuesServiceDynamoDb : IValuesService
+    public class DynamoDbValuesService : IValuesService
     {
         private readonly IDynamoDBContext _context;
 
-        public ValuesServiceDynamoDb(IDynamoDBContext context)
+        public DynamoDbValuesService(IDynamoDBContext context)
         {
             _context = context;
         }
@@ -27,9 +27,9 @@ namespace AwsHelloWorldWeb.Features.Values
         /// <param name="id"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task<ValueItem> Get(int id, CancellationToken cancellationToken = default)
+        public async Task<string> Get(int id, CancellationToken cancellationToken = default)
         {
-            return _context.LoadAsync<ValueItem>(GenerateHashKey(id), cancellationToken);
+            return (await _context.LoadAsync<DynamoDbValueItem>(GenerateHashKey(id), cancellationToken))?.Value;
         }
 
         /// <summary>
@@ -39,14 +39,14 @@ namespace AwsHelloWorldWeb.Features.Values
         /// <param name="useBackwardQuery"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<List<ValueItem>> List(int maxItems = 100, bool? useBackwardQuery = null, CancellationToken cancellationToken = default)
+        public async Task<List<string>> List(int maxItems = 100, bool? useBackwardQuery = null, CancellationToken cancellationToken = default)
         {
             maxItems = Math.Clamp(maxItems, 1, 100);
             var filter = new ScanFilter();
             filter.AddCondition("id", ScanOperator.BeginsWith, "value|");
-            var search = _context.FromScanAsync<ValueItem>(new ScanOperationConfig
+            var search = _context.FromScanAsync<DynamoDbValueItem>(new ScanOperationConfig
             {
-                IndexName = ValueItem.SortedIndex,
+                IndexName = DynamoDbValueItem.SortedIndex,
                 Limit = maxItems,
                 Filter = filter
             }, new DynamoDBOperationConfig
@@ -54,7 +54,10 @@ namespace AwsHelloWorldWeb.Features.Values
                 BackwardQuery = useBackwardQuery
             });
 
-            return await search.GetRemainingAsync(cancellationToken);
+            return (await search.GetRemainingAsync(cancellationToken))
+                .OrderBy(v => v.Id)
+                .Select(v => v.Value)
+                .ToList();
         }
 
         /// <summary>
@@ -63,27 +66,25 @@ namespace AwsHelloWorldWeb.Features.Values
         /// <param name="value"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<ValueItem> Append(string value, CancellationToken cancellationToken = default)
+        public async Task Append(string value, CancellationToken cancellationToken = default)
         {
-            var latest = await _context.LoadAsync<ValueItem>(LatestIdHashKey, cancellationToken);
+            var latest = await _context.LoadAsync<DynamoDbValueItem>(LatestIdHashKey, cancellationToken);
             if (latest == null)
             {
-                latest = new ValueItem(LatestIdHashKey, GenerateHashKey(1));
+                latest = new DynamoDbValueItem(LatestIdHashKey, GenerateHashKey(1));
             }
             else
             {
                 latest.Value = GenerateHashKey(ExtractId(latest.Value) + 1);
             }
 
-            var newItem = new ValueItem(latest.Value, value);
+            var newItem = new DynamoDbValueItem(latest.Value, value);
 
-            var batch = _context.CreateBatchWrite<ValueItem>();
+            var batch = _context.CreateBatchWrite<DynamoDbValueItem>();
             batch.AddPutItem(latest);
             batch.AddPutItem(newItem);
 
             await batch.ExecuteAsync(cancellationToken);
-
-            return newItem;
         }
 
         /// <summary>
@@ -93,12 +94,10 @@ namespace AwsHelloWorldWeb.Features.Values
         /// <param name="value"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<ValueItem> Upsert(int id, string value, CancellationToken cancellationToken = default)
+        public Task Upsert(int id, string value, CancellationToken cancellationToken = default)
         {
-            var item = new ValueItem(id, value);
-            await _context.SaveAsync(item, cancellationToken);
-
-            return item;
+            var item = new DynamoDbValueItem(id, value);
+            return _context.SaveAsync(item, cancellationToken);
         }
 
         /// <summary>
@@ -109,7 +108,7 @@ namespace AwsHelloWorldWeb.Features.Values
         /// <returns></returns>
         public Task Delete(int id, CancellationToken cancellationToken = default)
         {
-            return _context.DeleteAsync<ValueItem>(GenerateHashKey(id), cancellationToken);
+            return _context.DeleteAsync<DynamoDbValueItem>(GenerateHashKey(id), cancellationToken);
         }
     }
 }

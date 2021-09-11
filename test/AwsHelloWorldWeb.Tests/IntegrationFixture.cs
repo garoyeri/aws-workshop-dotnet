@@ -23,7 +23,7 @@ namespace AwsHelloWorldWeb.Tests
 
             DynamoDbSettings = Factory.Services.GetRequiredService<IOptions<DynamoDbSettings>>().Value;
             Client = Factory.Services.GetRequiredService<IAmazonDynamoDB>();
-            Values = Factory.Services.GetRequiredService<ValuesServiceDynamoDb>();
+            Values = Factory.Services.GetRequiredService<DynamoDbValuesService>();
         }
         
         public class TestApplicationFactory : WebApplicationFactory<Startup>
@@ -48,7 +48,7 @@ namespace AwsHelloWorldWeb.Tests
         public DynamoDbSettings DynamoDbSettings { get; }
         public IAmazonDynamoDB Client { get; }
         
-        public ValuesServiceDynamoDb Values { get; }
+        public DynamoDbValuesService Values { get; }
         
         /// <summary>
         /// Create the tables in DynamoDB
@@ -82,7 +82,7 @@ namespace AwsHelloWorldWeb.Tests
                     {
                         new GlobalSecondaryIndex
                         {
-                            IndexName = ValueItem.SortedIndex,
+                            IndexName = DynamoDbValueItem.SortedIndex,
                             KeySchema = new List<KeySchemaElement>
                             {
                                 new KeySchemaElement("dummy", KeyType.HASH),

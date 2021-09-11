@@ -1,16 +1,15 @@
 ﻿namespace AwsHelloWorldWeb.Features.Values
 {
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
 
     [Route("api/[controller]")]
     public class ValuesController : ControllerBase
     {
-        private readonly ValuesServiceDynamoDb _values;
+        private readonly IValuesService _values;
 
-        public ValuesController(ValuesServiceDynamoDb values)
+        public ValuesController(IValuesService values)
         {
             _values = values;
         }
@@ -19,10 +18,7 @@
         [HttpGet]
         public async Task<ActionResult<IEnumerable<string>>> Get()
         {
-            return Ok((await _values.List())
-                .OrderBy(r => r.Id)
-                .Select(r => r.Value)
-                .ToArray());
+            return Ok((await _values.List()));
         }
 
         // GET api/values/5
@@ -33,7 +29,7 @@
             if (found == null)
                 return NotFound();
 
-            return Ok(found.Value);
+            return Ok(found);
         }
 
         // POST api/values
