@@ -7,7 +7,9 @@ namespace AwsHelloWorldWeb.Features.Values
     {
         public void Configure(EntityTypeBuilder<DatabaseValueItem> builder)
         {
-            builder.ToTable("Values").HasKey(v => v.Id);
+            builder.ToTable("Values")
+                .HasKey(v => v.Id);
+            builder.Property(v => v.Id).UseIdentityByDefaultColumn();
             builder.Property(v => v.Value).IsRequired();
         }
     }
