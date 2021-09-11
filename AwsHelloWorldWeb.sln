@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-#
+# 
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1F8313BC-F870-460B-9394-138E5CE1B407}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AwsHelloWorldWeb", "src\AwsHelloWorldWeb\AwsHelloWorldWeb.csproj", "{8A826E9E-711C-46CF-9FCE-3E09ACB96912}"
@@ -10,14 +10,16 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AwsHelloWorldWeb.Tests", "test\AwsHelloWorldWeb.Tests\AwsHelloWorldWeb.Tests.csproj", "{1DFBE025-0774-4517-A58C-775A474D3C72}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{4D8A48A2-DA50-49E3-919E-D58A70A56FD3}"
-ProjectSection(SolutionItems) = preProject
-	deploy\.env = deploy\.env
-	deploy\.env.example.txt = deploy\.env.example.txt
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		deploy\.env = deploy\.env
+		deploy\.env.example.txt = deploy\.env.example.txt
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4EB6E3A4-13FF-48BD-9F5D-55E37472BC4B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deploy", "deploy\src\Deploy\Deploy.csproj", "{5D0AC76F-24B2-40D6-83BB-9FF88B89373F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kralizek.Extensions.Configuration.AWSSecretsManager", "src\Kralizek.Extensions.Configuration.AWSSecretsManager\Kralizek.Extensions.Configuration.AWSSecretsManager.csproj", "{26862942-9BB7-4A62-B5B0-723578D127DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,11 +39,16 @@ Global
 		{5D0AC76F-24B2-40D6-83BB-9FF88B89373F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D0AC76F-24B2-40D6-83BB-9FF88B89373F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D0AC76F-24B2-40D6-83BB-9FF88B89373F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26862942-9BB7-4A62-B5B0-723578D127DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26862942-9BB7-4A62-B5B0-723578D127DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26862942-9BB7-4A62-B5B0-723578D127DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26862942-9BB7-4A62-B5B0-723578D127DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8A826E9E-711C-46CF-9FCE-3E09ACB96912} = {1F8313BC-F870-460B-9394-138E5CE1B407}
 		{1DFBE025-0774-4517-A58C-775A474D3C72} = {8F7C98C6-346C-496B-BF32-0290BD5E9EA0}
 		{4EB6E3A4-13FF-48BD-9F5D-55E37472BC4B} = {4D8A48A2-DA50-49E3-919E-D58A70A56FD3}
 		{5D0AC76F-24B2-40D6-83BB-9FF88B89373F} = {4EB6E3A4-13FF-48BD-9F5D-55E37472BC4B}
+		{26862942-9BB7-4A62-B5B0-723578D127DD} = {1F8313BC-F870-460B-9394-138E5CE1B407}
 	EndGlobalSection
 EndGlobal

@@ -6,6 +6,9 @@ using Microsoft.Extensions.Hosting;
 
 namespace AwsHelloWorldWeb
 {
+    using System.Collections.Generic;
+    using Microsoft.Extensions.Configuration;
+
     /// <summary>
     /// This class extends from APIGatewayProxyFunction which contains the method FunctionHandlerAsync which is the 
     /// actual Lambda function entry point. The Lambda handler field should be set to
@@ -47,6 +50,24 @@ namespace AwsHelloWorldWeb
         /// <param name="builder"></param>
         protected override void Init(IHostBuilder builder)
         {
+        }
+
+        protected override IHostBuilder CreateHostBuilder()
+        {
+            return base.CreateHostBuilder()
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    // if there is a secrets ARN configured AND we're not in development mode,
+                    //  pull the secrets from the secrets manager
+                    var secretsArn = config.Build().GetValue<string>("Database:ConnectionSecretArn");
+                    if (secretsArn != null && !hostingContext.HostingEnvironment.IsDevelopment())
+                    {
+                        config.AddSecretsManager(configurator: options =>
+                        {
+                            options.AcceptedSecretArns = new List<string> { secretsArn };
+                        });
+                    }
+                });
         }
     }
 }
