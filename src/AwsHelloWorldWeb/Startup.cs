@@ -17,7 +17,6 @@ namespace AwsHelloWorldWeb
     using Amazon.DynamoDBv2;
     using Amazon.DynamoDBv2.DataModel;
     using Amazon.Runtime;
-    using Database;
     using Features.Values;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Options;
@@ -36,9 +35,12 @@ namespace AwsHelloWorldWeb
         public void ConfigureServices(IServiceCollection services)
         {
             var inDevelopment = Configuration.GetValue<string>("ASPNETCORE_ENVIRONMENT") == "Development";
+            var mode = Configuration.GetValue<PersistenceMode>("Database:PersistenceMode");
 
             services.AddControllers(o =>
             {
+                if (mode == PersistenceMode.Database)
+                    o.Filters.Add<UnitOfWork>();
                 o.Filters.Add<ExceptionFilter>();
             });
 
@@ -50,37 +52,43 @@ namespace AwsHelloWorldWeb
                 });
             }
 
+            services.Configure<DatabaseSettings>(Configuration.GetSection("Database"));
             services.Configure<DynamoDbSettings>(Configuration.GetSection("DynamoDB"));
             services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
-            
-            services.AddScoped<ExceptionFilter>();
 
-            // when in local development mode, the service URL is set and SOME credentials must be provided
-            var dynamoOptions = Configuration.GetAWSOptions("DynamoDB");
-            if (dynamoOptions.DefaultClientConfig.ServiceURL == "http://localhost:8000")
-                dynamoOptions.Credentials = new BasicAWSCredentials("DUMMY", "DUMMY");
-            services.AddAWSService<IAmazonDynamoDB>(dynamoOptions);
-
-            // setup DynamoDB context, adding optional table name prefix
-            services.AddSingleton<IDynamoDBContext>(p =>
+            if (mode == PersistenceMode.DynamoDb)
             {
-                var options = p.GetRequiredService<IOptions<DynamoDbSettings>>();
-                var client = p.GetRequiredService<IAmazonDynamoDB>();
+                // when in local development mode, the service URL is set and SOME credentials must be provided
+                var dynamoOptions = Configuration.GetAWSOptions("DynamoDB");
+                if (dynamoOptions.DefaultClientConfig.ServiceURL == "http://localhost:8000")
+                    dynamoOptions.Credentials = new BasicAWSCredentials("DUMMY", "DUMMY");
+                services.AddAWSService<IAmazonDynamoDB>(dynamoOptions);
 
-                return new DynamoDBContext(client, new DynamoDBContextConfig
+                // setup DynamoDB context, adding optional table name prefix
+                services.AddSingleton<IDynamoDBContext>(p =>
                 {
-                    TableNamePrefix = options.Value.TableNamePrefix,
-                    ConsistentRead = true
+                    var options = p.GetRequiredService<IOptions<DynamoDbSettings>>();
+                    var client = p.GetRequiredService<IAmazonDynamoDB>();
+
+                    return new DynamoDBContext(client, new DynamoDBContextConfig
+                    {
+                        TableNamePrefix = options.Value.TableNamePrefix,
+                        ConsistentRead = true
+                    });
                 });
-            });
-            
-            services.AddSingleton<ValuesServiceDynamoDb>();
-            
-            // relational database support
-            services.AddDbContext<ValuesContext>(o =>
+
+                services.AddSingleton<IValuesService, DynamoDbValuesService>();
+            }
+            else if (mode == PersistenceMode.Database)
             {
-                o.UseNpgsql(Configuration.GetConnectionString("Database"));
-            });
+                // relational database support
+                services.AddDbContext<ValuesContext>(o =>
+                {
+                    o.UseNpgsql(Configuration.GetConnectionString("Database"));
+                });
+
+                services.AddScoped<IValuesService, DatabaseValuesService>();
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
