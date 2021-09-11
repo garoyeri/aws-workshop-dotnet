@@ -1,34 +1,59 @@
 namespace AwsHelloWorldWeb.Features.Values
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.EntityFrameworkCore;
 
     public class DatabaseValuesService : IValuesService
     {
-        public Task<string> Get(int id, CancellationToken cancellationToken = default)
+        private readonly ValuesContext _context;
+
+        public DatabaseValuesService(ValuesContext context)
         {
-            throw new System.NotImplementedException();
+            _context = context;
+        }
+        
+        public async Task<string> Get(int id, CancellationToken cancellationToken = default)
+        {
+            var item = await _context.Values.FindAsync(id);
+            return item?.Value;
         }
 
         public Task<List<string>> List(int maxItems = 100, bool? useBackwardQuery = null, CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            return _context.Values
+                .OrderBy(v => v.Id)
+                .Select(v => v.Value)
+                .ToListAsync(cancellationToken);
         }
 
-        public Task Append(string value, CancellationToken cancellationToken = default)
+        public async Task Append(string value, CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            await _context.Values.AddAsync(new DatabaseValueItem { Value = value }, cancellationToken);
         }
 
-        public Task Upsert(int id, string value, CancellationToken cancellationToken = default)
+        public async Task Upsert(int id, string value, CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            var found = await _context.Values.FindAsync(id);
+            if (found == null)
+            {
+                await _context.Values.AddAsync(new DatabaseValueItem { Id = id, Value = value }, cancellationToken);
+            }
+            else
+            {
+                found.Value = value;
+            }
         }
 
-        public Task Delete(int id, CancellationToken cancellationToken = default)
+        public async Task Delete(int id, CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            var found = await _context.Values.FindAsync(id);
+            if (found != null)
+            {
+                _context.Values.Remove(found);
+            }
         }
     }
 }
