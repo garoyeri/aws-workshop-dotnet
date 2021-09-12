@@ -15,7 +15,7 @@ namespace Deploy
         public CfnParameter DomainName { get; set; }
         public string RootHostedZoneId { get; set; }
         public string RootHostedZoneName { get; set; }
-        public string TargetPath { get; set; }
+        public string TargetPath { get; set; } = "..";
         public string Dockerfile { get; set; } = "Dockerfile";
         public bool SkipCertificate { get; set; } = false;
         public string TableNamePrefix = "";

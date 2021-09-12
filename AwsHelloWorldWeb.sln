@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# 
+#
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1F8313BC-F870-460B-9394-138E5CE1B407}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AwsHelloWorldWeb", "src\AwsHelloWorldWeb\AwsHelloWorldWeb.csproj", "{8A826E9E-711C-46CF-9FCE-3E09ACB96912}"

@@ -11,7 +11,7 @@ namespace Deploy
             var rootHostedZoneId = Fn.ImportValue("RootDomainHostedZoneId");
             var rootHostedZoneName = Fn.ImportValue("RootDomainHostedZoneName");
 
-            var lambda = new HelloLambda(this, "HelloLambda", "../src/AwsHelloWorldWeb");
+            var lambda = new HelloLambda(this, "HelloLambda", "..");
             var api = new SingleLambdaApiGateway(this, "Api", new SingleLambdaApiGatewayProps
             {
                 DomainName = domainName,

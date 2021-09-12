@@ -37,7 +37,6 @@ namespace Deploy
                 DomainName = domainName,
                 RootHostedZoneId = rootHostedZoneId,
                 RootHostedZoneName = rootHostedZoneName,
-                TargetPath = "../src/AwsHelloWorldWeb",
                 Dockerfile = "Container.Dockerfile",
                 SkipCertificate = skipCertificate,
                 TableNamePrefix = tableNamePrefix

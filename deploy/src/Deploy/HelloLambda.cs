@@ -10,7 +10,7 @@ namespace Deploy
         public DockerImageFunction Function { get; }
         public LambdaProxyIntegration Integration { get; }
 
-        public HelloLambda(Construct scope, string id, string targetPath) : base(scope, id)
+        public HelloLambda(Construct scope, string id, string targetPath = "..") : base(scope, id)
         {
             Function = new DockerImageFunction(this, "Lambda", new DockerImageFunctionProps
             {
