@@ -24,10 +24,21 @@ namespace Deploy
 
             var database = new ValuesDatabase(this, "Database", new ValuesDatabaseProps
             {
+                Vpc = vpc,
+                RemovalPolicy = RemovalPolicy.DESTROY
+            });
+
+            var migration = new HelloLambda(this, "Migration", new HelloLambdaProps
+            {
+                FunctionHandler = "AwsHelloWorldWeb::AwsHelloWorldWeb.MigrationLambdaEntryPoint::FunctionHandlerAsync",
+                Timeout = Duration.Minutes(15),
                 Vpc = vpc
             });
-            
-            var lambda = new HelloLambda(this, "HelloLambda");
+
+            var lambda = new HelloLambda(this, "HelloLambda", new HelloLambdaProps
+            {
+                Vpc = vpc
+            });
             var api = new SingleLambdaApiGateway(this, "Api", new SingleLambdaApiGatewayProps
             {
                 DomainName = domainName,
@@ -37,16 +48,10 @@ namespace Deploy
                 RootHostedZoneName = rootHostedZoneName,
                 SkipCertificate = skipCertificate
             });
-            
-            // reconfigure the lambda for database mode and pass the extra configuration in the environment
-            lambda.Function
-                .AddEnvironment("Database__PersistenceMode", "Database")
-                .AddEnvironment("Database__Hostname", database.Cluster.ClusterEndpoint.Hostname)
-                .AddEnvironment("Database__ConnectionSecretArn", database.Cluster.Secret.SecretArn);
 
-            // allow the lambda to access the secret
-            database.Cluster.Secret.GrantRead(lambda.Function);
-            
+            lambda.Function.UseDatabase(database);
+            migration.Function.UseDatabase(database);
+
             new CfnOutput(this, "ApiEndpoint", new CfnOutputProps
             {
                 Value = api.Gateway.ApiEndpoint
@@ -54,6 +59,10 @@ namespace Deploy
             new CfnOutput(this, "Table", new CfnOutputProps
             {
                 Value = database.Cluster.ClusterEndpoint.Hostname
+            });
+            new CfnOutput(this, "MigrationFunctionArn", new CfnOutputProps
+            {
+                Value = migration.Function.FunctionArn
             });
         }
     }

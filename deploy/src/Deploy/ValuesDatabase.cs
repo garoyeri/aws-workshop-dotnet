@@ -17,22 +17,26 @@ namespace Deploy
                 {
                     Version = AuroraPostgresEngineVersion.VER_12_6
                 }),
-                Credentials = Credentials.FromGeneratedSecret("admin"),
+                Credentials = Credentials.FromGeneratedSecret("values_user"),
                 InstanceProps = new InstanceProps
                 {
-                    InstanceType = InstanceType.Of(InstanceClass.BURSTABLE3, InstanceSize.SMALL),
+                    InstanceType = InstanceType.Of(InstanceClass.BURSTABLE3, InstanceSize.MEDIUM),
                     Vpc = props.Vpc,
                     VpcSubnets = new SubnetSelection
                     {
                         SubnetType = SubnetType.PRIVATE
                     }
-                }
+                },
+                RemovalPolicy = props.RemovalPolicy
             });
+            // not public, so it will only allow from within the VPC
+            Cluster.Connections.AllowDefaultPortFromAnyIpv4();
         }
     }
 
     public class ValuesDatabaseProps
     {
         public IVpc Vpc { get; set; }
+        public RemovalPolicy RemovalPolicy { get; set; } = RemovalPolicy.RETAIN;
     }
 }

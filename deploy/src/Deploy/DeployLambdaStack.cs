@@ -11,7 +11,7 @@ namespace Deploy
             var rootHostedZoneId = Fn.ImportValue("RootDomainHostedZoneId");
             var rootHostedZoneName = Fn.ImportValue("RootDomainHostedZoneName");
 
-            var lambda = new HelloLambda(this, "HelloLambda", "..");
+            var lambda = new HelloLambda(this, "HelloLambda", new HelloLambdaProps());
             var api = new SingleLambdaApiGateway(this, "Api", new SingleLambdaApiGatewayProps
             {
                 DomainName = domainName,
@@ -20,7 +20,10 @@ namespace Deploy
                 Integration = lambda.Integration,
                 SkipCertificate = skipCertificate
             });
-            var table = new ValuesDynamoTable(this, "ValuesTable");
+            var table = new ValuesDynamoTable(this, "ValuesTable", new ValuesDynamoTableProps
+            {
+                RemovalPolicy = RemovalPolicy.DESTROY
+            });
 
             // allow the lambda function to use the DynamoDB table
             table.Table.GrantFullAccess(lambda.Function);

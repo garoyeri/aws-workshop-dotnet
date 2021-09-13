@@ -42,7 +42,11 @@ namespace Deploy
                 TableNamePrefix = tableNamePrefix
             });
             
-            var database = new ValuesDynamoTable(this, "Values", tableNamePrefix);
+            var database = new ValuesDynamoTable(this, "Values", new ValuesDynamoTableProps
+            {
+                TablePrefix = tableNamePrefix,
+                RemovalPolicy = RemovalPolicy.DESTROY
+            });
             database.Table.GrantFullAccess(task.App.TaskDefinition.TaskRole);
         }
     }
