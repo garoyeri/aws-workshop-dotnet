@@ -35,6 +35,7 @@ If you have a domain name handy, you can deploy a AWS Route53 Hosted Zone to pro
 
 ```shell
 cd deploy
+npm install
 dotnet build src
 npm run cdk -- bootstrap --profile personal
 npm run cdk -- deploy DeployDnsStack --parameters DeployDnsStack:RootDomainName=kcdc.garoyeri.dev --profile personal
