@@ -40,7 +40,7 @@ namespace AwsHelloWorldWeb
                 o.Filters.Add<ExceptionFilter>();
             });
 
-            if (inDevelopment)
+            //if (inDevelopment)
             {
                 services.AddSwaggerGen(c =>
                 {
@@ -86,7 +86,7 @@ namespace AwsHelloWorldWeb
             app.UseHttpsRedirection();
             
             // only turn Swagger on in development
-            if (env.IsDevelopment())
+            //if (env.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
