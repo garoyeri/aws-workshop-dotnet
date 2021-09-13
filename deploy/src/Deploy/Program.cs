@@ -1,18 +1,17 @@
-﻿using Amazon.CDK;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Deploy
+﻿namespace Deploy
 {
+    using Amazon.CDK;
+
     sealed class Program
     {
         public static void Main(string[] args)
         {
             var app = new App();
+            Tags.Of(app).Add("workshop", "https://github.com/garoyeri/aws-workshop-dotnet");
+
             new DeployDnsStack(app, "DeployDnsStack", new StackProps
             {
-                Env = new Amazon.CDK.Environment
+                Env = new Environment
                 {
                     Account = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_ACCOUNT"),
                     Region = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_REGION"),
@@ -20,7 +19,7 @@ namespace Deploy
             });
             new DeployVpcStack(app, "DeployVpcStack", new StackProps
             {
-                Env = new Amazon.CDK.Environment
+                Env = new Environment
                 {
                     Account = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_ACCOUNT"),
                     Region = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_REGION"),
@@ -38,7 +37,7 @@ namespace Deploy
                     // Uncomment the next block to specialize this stack for the AWS Account
                     // and Region that are implied by the current CLI configuration.
 
-                    Env = new Amazon.CDK.Environment
+                    Env = new Environment
                     {
                         Account = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_ACCOUNT"),
                         Region = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_REGION"),
@@ -60,7 +59,7 @@ namespace Deploy
             new DeployContainerStack(app, "DeployContainerStack", skipCertificate: false,
                 new StackProps
                 {
-                    Env = new Amazon.CDK.Environment
+                    Env = new Environment
                     {
                         Account = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_ACCOUNT"),
                         Region = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_REGION"),
