@@ -25,8 +25,7 @@ namespace Deploy
                 RemovalPolicy = RemovalPolicy.DESTROY
             });
 
-            // allow the lambda function to use the DynamoDB table
-            table.Table.GrantFullAccess(lambda.Function);
+            lambda.Function.UseDynamoDb(table);
 
             new CfnOutput(this, "ApiEndpoint", new CfnOutputProps
             {

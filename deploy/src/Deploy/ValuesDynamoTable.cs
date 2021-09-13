@@ -13,6 +13,7 @@ namespace Deploy
     {
         public ValuesDynamoTable(Construct scope, string id, ValuesDynamoTableProps props) : base(scope, id)
         {
+            TablePrefix = props.TablePrefix;
             Table = new Table(this, "Table", new TableProps
             {
                 BillingMode = BillingMode.PAY_PER_REQUEST,
@@ -31,5 +32,6 @@ namespace Deploy
         }
         
         public Table Table { get; }
+        public string TablePrefix { get; }
     }
 }

@@ -7,7 +7,9 @@ namespace Deploy
     using Amazon.CDK.AWS.Ecr.Assets;
     using Amazon.CDK.AWS.ECS;
     using Amazon.CDK.AWS.ECS.Patterns;
+    using Amazon.CDK.AWS.ElasticLoadBalancingV2;
     using Amazon.CDK.AWS.Route53;
+    using HealthCheck = Amazon.CDK.AWS.ElasticLoadBalancingV2.HealthCheck;
 
     public class HelloContainerProps
     {
@@ -20,6 +22,7 @@ namespace Deploy
         public bool SkipCertificate { get; set; } = false;
         public string TableNamePrefix = "";
         public IVpc Vpc = null;
+        public IDictionary<string, string> Environment { get; set; }
     }
 
     public class HelloContainer : Construct
@@ -58,16 +61,11 @@ namespace Deploy
                     MemoryLimitMiB = 512,
                     DomainZone = Zone,
                     DomainName = fullDomainName,
-                    Vpc = props.Vpc,
                     TaskImageOptions = new ApplicationLoadBalancedTaskImageOptions
                     {
                         Image = ContainerImage.FromDockerImageAsset(image),
                         ContainerName = "Web",
-                        Environment = new Dictionary<string, string>
-                        {
-                            // override the dynamodb prefix
-                            { "DynamoDB__TableNamePrefix", props.TableNamePrefix }
-                        }
+                        Environment = props.Environment
                     }
                 });
         }

@@ -1,7 +1,6 @@
 namespace Deploy
 {
     using System.Collections.Generic;
-    using System.ComponentModel;
     using Amazon.CDK;
     using Amazon.CDK.AWS.EC2;
     using Amazon.CDK.AWS.ECS;
@@ -15,8 +14,6 @@ namespace Deploy
             var domainName = new CfnParameter(this, "DomainName");
             var rootHostedZoneId = Fn.ImportValue("RootDomainHostedZoneId");
             var rootHostedZoneName = Fn.ImportValue("RootDomainHostedZoneName");
-            var vpcId = Fn.ImportValue("VpcId");
-            var availabilityZones = Fn.ImportListValue("AvailabilityZones", 2, ",");
 
             var vpc = Vpc.FromLookup(this, "Vpc", new VpcLookupOptions
             {
@@ -30,7 +27,13 @@ namespace Deploy
             {
                 Vpc = vpc
             });
-            
+
+            var database = new ValuesDynamoTable(this, "Values", new ValuesDynamoTableProps
+            {
+                TablePrefix = tableNamePrefix,
+                RemovalPolicy = RemovalPolicy.DESTROY
+            });
+
             var task = new HelloContainer(this, "HelloContainer", new HelloContainerProps
             {
                 Cluster = cluster,
@@ -39,15 +42,11 @@ namespace Deploy
                 RootHostedZoneName = rootHostedZoneName,
                 Dockerfile = "Container.Dockerfile",
                 SkipCertificate = skipCertificate,
-                TableNamePrefix = tableNamePrefix
+                TableNamePrefix = tableNamePrefix,
+                Environment = Extensions.UseDynamoDbEnvironment(database)
             });
             
-            var database = new ValuesDynamoTable(this, "Values", new ValuesDynamoTableProps
-            {
-                TablePrefix = tableNamePrefix,
-                RemovalPolicy = RemovalPolicy.DESTROY
-            });
-            database.Table.GrantFullAccess(task.App.TaskDefinition.TaskRole);
+            task.App.TaskDefinition.UseDynamoDb(database);
         }
     }
 }
