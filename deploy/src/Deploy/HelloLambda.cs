@@ -21,7 +21,8 @@ namespace Deploy
                 {
                     Cmd = new [] {"AwsHelloWorldWeb::AwsHelloWorldWeb.LambdaEntryPoint::FunctionHandlerAsync"},
                     Entrypoint = new[] { "/lambda-entrypoint.sh" }
-                })
+                }),
+                Timeout = Duration.Minutes(1)
             });
 
             Integration = new LambdaProxyIntegration(new LambdaProxyIntegrationProps()
