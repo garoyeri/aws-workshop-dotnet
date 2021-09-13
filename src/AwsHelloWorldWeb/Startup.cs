@@ -1,27 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-
-namespace AwsHelloWorldWeb
+﻿namespace AwsHelloWorldWeb
 {
-    using Amazon.DynamoDBv2;
-    using Amazon.DynamoDBv2.DataModel;
-    using Amazon.Runtime;
-    using Features.Values;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Options;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
     using Microsoft.OpenApi.Models;
-    using Npgsql;
 
     public class Startup
     {
@@ -59,44 +44,11 @@ namespace AwsHelloWorldWeb
 
             if (mode == PersistenceMode.DynamoDb)
             {
-                // when in local development mode, the service URL is set and SOME credentials must be provided
-                var dynamoOptions = Configuration.GetAWSOptions("DynamoDB");
-                if (dynamoOptions.DefaultClientConfig.ServiceURL == "http://localhost:8000")
-                    dynamoOptions.Credentials = new BasicAWSCredentials("DUMMY", "DUMMY");
-                services.AddAWSService<IAmazonDynamoDB>(dynamoOptions);
-
-                // setup DynamoDB context, adding optional table name prefix
-                services.AddSingleton<IDynamoDBContext>(p =>
-                {
-                    var options = p.GetRequiredService<IOptions<DynamoDbSettings>>();
-                    var client = p.GetRequiredService<IAmazonDynamoDB>();
-
-                    return new DynamoDBContext(client, new DynamoDBContextConfig
-                    {
-                        TableNamePrefix = options.Value.TableNamePrefix,
-                        ConsistentRead = true
-                    });
-                });
-
-                services.AddSingleton<IValuesService, DynamoDbValuesService>();
+                services.AddDynamoDbValuesService(Configuration);
             }
             else if (mode == PersistenceMode.Database)
             {
-                // relational database support
-                services.AddDbContext<ValuesContext>(o =>
-                {
-                    // override the connection string with values from the secrets / configuration
-                    var settings = Configuration.GetSection("Database").Get<DatabaseSettings>();
-                    var connectionString =
-                        new NpgsqlConnectionStringBuilder(Configuration.GetConnectionString("Database"));
-                    connectionString.Host = settings.Hostname ?? connectionString.Host;
-                    connectionString.Username = settings.Username ?? connectionString.Username;
-                    connectionString.Password = settings.Password ?? connectionString.Password;
-                    
-                    o.UseNpgsql(connectionString.ToString());
-                });
-
-                services.AddScoped<IValuesService, DatabaseValuesService>();
+                services.AddDatabaseValuesService(Configuration);
             }
         }
 
