@@ -30,7 +30,7 @@
                 o.Filters.Add<ExceptionFilter>();
             });
 
-            if (inDevelopment)
+            //if (inDevelopment)
             {
                 services.AddSwaggerGen(c =>
                 {
@@ -63,7 +63,7 @@
             app.UseHttpsRedirection();
             
             // only turn Swagger on in development
-            if (env.IsDevelopment())
+            //if (env.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
