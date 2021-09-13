@@ -19,6 +19,7 @@ namespace Deploy
             new DeployContainerStack(app, "DeployContainerStack", skipCertificate, MakeStackProps());
             
             new DeployDatabaseLambdaStack(app, "DeployDatabaseLambdaStack", skipCertificate, MakeStackProps());
+            new DeployDatabaseContainerStack(app, "DeployDatabaseContainerStack", skipCertificate, MakeStackProps());
 
             app.Synth();
         }
