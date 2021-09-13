@@ -72,10 +72,9 @@ namespace AwsHelloWorldWeb
             // if there is a secrets ARN configured AND we're not in development mode,
             //  pull the secrets from the secrets manager
             var secretsArn = config.Build().GetValue<string>("Database:ConnectionSecretArn");
-            var arn = Arn.Parse(secretsArn);
-            
             if (secretsArn != null && !hostingContext.HostingEnvironment.IsDevelopment())
             {
+                var arn = Arn.Parse(secretsArn);
                 config.AddSecretsManager(configurator: options =>
                 {
                     options.AcceptedSecretArns = new List<string> { secretsArn };
