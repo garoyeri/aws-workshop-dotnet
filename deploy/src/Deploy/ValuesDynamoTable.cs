@@ -11,7 +11,8 @@ namespace Deploy
             {
                 BillingMode = BillingMode.PAY_PER_REQUEST,
                 PartitionKey = new Attribute { Name = "id", Type = AttributeType.STRING },
-                TableName = $"{tablePrefix}Values"
+                TableName = $"{tablePrefix}Values",
+                RemovalPolicy = RemovalPolicy.DESTROY   // for convenience, delete the table when deleting the stack
             });
             
             Table.AddGlobalSecondaryIndex(new GlobalSecondaryIndexProps
