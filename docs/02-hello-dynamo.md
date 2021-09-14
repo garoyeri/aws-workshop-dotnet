@@ -97,6 +97,24 @@ When the application is deployed to AWS, the Swagger document and UI pages are n
 
 The test project was updated to create a test fixture that will create the necesarry table in a local DynamoDB to run the unit tests against a real database. These are handled by the `test/AwsHelloWorldWeb.Tests/IntegrationFixture.cs` file and are created once per test collection. This will create the DynamoDB schema (deleting the old one) and let you run tests against the database.
 
+To run the application and testing locally, you'll need to fire up the local DynamoDB instance. Navigate to the `test/hello-dynamo` folder with your favorite terminal and run the following:
+
+```shell
+docker compose up -d
+```
+
+This will start the DynamoDB locally on port 8000. If you need a different port, you can edit the docker compose file to remap it. However, there's some other logic around `http://localhost:8000` so you'll need to search and replace the instances of that in the code with your updated port number. 
+
+It will also create a `data` folder where the PostgreSQL files are persisted so that the data is kept around between database creation and deletion. If you want to clear out the database, just stop the container:
+
+```shell
+docker compose down
+```
+
+And delete the folder.
+
+You can start and stop the service using the Docker Desktop Dashboard.
+
 ### Database Permissions
 
 We're still deploying at a Lambda + API Gateway, but also adding the DynamoDB table that's created. We will use the CDK `Table` item to create the DynamoDB table and the Global Secondary Index we'll need to get a sorted list.

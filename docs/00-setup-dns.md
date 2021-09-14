@@ -52,12 +52,12 @@ DeployDnsStack.NameServers = ns-1484.awsdns-57.org,ns-1947.awsdns-51.co.uk,ns-95
 
 These will be used for setting up your DNS. Go to your DNS provider and add NS records for the desired subdomain. For example on the output above, you should add the following records to your DNS provider:
 
-| Record Type | Record              | TTL    | Value                     |
-| ----------- | ------------------- | ------ | ------------------------- |
-| `NS`        | `kcdc.garoyeri.dev` | `3600` | `ns-1484.awsdns-57.org`   |
-| `NS`        | `kcdc.garoyeri.dev` | `3600` | `ns-1947.awsdns-51.co.uk` |
-| `NS`        | `kcdc.garoyeri.dev` | `3600` | `ns-952.awsdns-55.net`    |
-| `NS`        | `kcdc.garoyeri.dev` | `3600` | `ns-64.awsdns-08.com`     |
+| Record Type | Record | TTL    | Value                     |
+| ----------- | ------ | ------ | ------------------------- |
+| `NS`        | `kcdc` | `3600` | `ns-1484.awsdns-57.org`   |
+| `NS`        | `kcdc` | `3600` | `ns-1947.awsdns-51.co.uk` |
+| `NS`        | `kcdc` | `3600` | `ns-952.awsdns-55.net`    |
+| `NS`        | `kcdc` | `3600` | `ns-64.awsdns-08.com`     |
 
 Your DNS provider may represent these accounts in different ways. Usually you'll either see separate entries for each nameserver, or you'll see a single entry with 4 answers. In either case, the DNS entries will be 4 and look like the table above. You can start the TTL with 1 hour for now, then increase it later to 48 hours to reduce the amount of DNS traffic and improve caching.
 
