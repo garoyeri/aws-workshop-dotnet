@@ -1,8 +1,55 @@
 # Are you there .NET? It's me, AWS.
 
-This project is a minimal .NET 5 ASP.NET Core web application that can be deployed on AWS as a Lambda or a Fargate container, or run locally.
+This project is a (very) minimal .NET 5 ASP.NET Core web application that can be deployed on AWS as a Lambda or a Fargate container, or run locally. It will demonstrate the resources required to deploy the basic applications using AWS CDK and allow for enough configurability to be useful.
 
 [TOC]
+
+## Setup AWS CLI
+
+The rest of the instructions assume that you've got an AWS account setup already, you've setup a programmatic access user, and created a local CLI profile called `personal` with the access key an secret key.
+
+If you don't have a `personal` profile, but instead are using `default`, then you can remove that part of each command. If you do have a profile but it's not called `personal`, then use that profile name instead. Something has to tell AWS what credentials to use.
+
+## Workshop 00: Deploying DNS
+
+To make it easier to find the applications that are being deployed, we need to setup DNS so we can have nice names. This is very important because "naming things" is one of the hardest problems in software development.
+
+Go to [Deploying DNS](docs/00-setup-dns.md).
+
+## Workshop 01: Deploying the Hello World Web
+
+Next, we'll deploy a Lambda + ASP.NET Core web application.
+
+Go to [Deploying the Hello World Web](docs/01-hello-lambda.md).
+
+## Workshop 02: Adding DynamoDB
+
+Next, we'll deploy a DynamoDB table as well and persist the values in the API.
+
+Go to [Adding DynamoDB](docs/02-hello-dynamo.md).
+
+## Workshop 03: Containerized Application on Fargate
+
+Go to [Containerized Application on Fargate](docs/03-hello-container.md).
+
+The next step is to explore the containerized application on AWS Fargate. So far, we've deployed Lambas, but the next step is more common for heavier ASP.NET Core applications, and anything that uses Razor pages. The Lambda approach works well for APIs, but not full websites that would benefit from more in-process caching.
+
+Checkout the branch `workshop/03-hello-container`. We need to deploy two things here: the VPC and the container application. Use the following commands:
+
+```shell
+npm run cdk -- deploy DeployVpcStack --profile personal
+npm run cdk -- deploy DeployContainerStack --parameters DeployContainerStack:DomainName=hello-container --profile personal
+```
+
+This will deploy an application and the outputs will include the DNS name and the Load Balancer URL (again, in case you didn't setup a domain name):
+
+```shell
+Outputs:
+DeployContainerStack.HelloContainerServiceLoadBalancerDNS8D6004C8 = Deplo-Hello-P15QD5D8MZ50-660410385.us-east-1.elb.amazonaws.com
+DeployContainerStack.HelloContainerServiceServiceURLBB0F4736 = https://hello-container.kcdc.garoyeri.dev
+```
+
+
 
 ## Building this repository from scratch
 
@@ -119,49 +166,3 @@ As you work with CDK, you'll pull new package references into your project to ad
 This way, you can update the `<CDKVersion>` element once to update all the package references and keep them in lock step.
 
 There's little stopping you from staying with a particular version. CDK is based on CloudFormation whose template schema version is still dated `2010-09-09`. All the AWS services likewise tend to be very backwards compatible, so there's little chance of something suddenly completely stopping working. The only reason to upgrade would be to support bug fixes or if there's a new service or setting that is available only in new configuration schemas for those services.
-
-## Setup AWS CLI
-
-The rest of the instructions assume that you've got an AWS account setup already, you've setup a programmatic access user, and created a local CLI profile called `"personal`" with the access key an secret key.
-
-## Workshop 00: Deploying DNS
-
-To make it easier to find the applications that are being deployed, we need to setup DNS so we can have nice names. This is very important because "naming things" is one of the hardest problems in software development.
-
-Go to [Deploying DNS](docs/00-setup-dns.md).
-
-## Workshop 01: Deploying the Hello World Web
-
-Next, we'll deploy a Lambda + ASP.NET Core web application.
-
-Go to [Deploying the Hello World Web](docs/01-hello-lambda.md).
-
-## Workshop 02: Adding DynamoDB
-
-Next, we'll deploy a DynamoDB table as well and persist the values in the API.
-
-Go to [Adding DynamoDB](docs/02-hello-dynamo.md).
-
-## Workshop 03: Containerized Application on Fargate
-
-Go to [Containerized Application on Fargate](docs/03-hello-container.md).
-
-The next step is to explore the containerized application on AWS Fargate. So far, we've deployed Lambas, but the next step is more common for heavier ASP.NET Core applications, and anything that uses Razor pages. The Lambda approach works well for APIs, but not full websites that would benefit from more in-process caching.
-
-Checkout the branch `workshop/03-hello-container`. We need to deploy two things here: the VPC and the container application. Use the following commands:
-
-```shell
-npm run cdk -- deploy DeployVpcStack --profile personal
-npm run cdk -- deploy DeployContainerStack --parameters DeployContainerStack:DomainName=hello-container --profile personal
-```
-
-This will deploy an application and the outputs will include the DNS name and the Load Balancer URL (again, in case you didn't setup a domain name):
-
-```shell
-Outputs:
-DeployContainerStack.HelloContainerServiceLoadBalancerDNS8D6004C8 = Deplo-Hello-P15QD5D8MZ50-660410385.us-east-1.elb.amazonaws.com
-DeployContainerStack.HelloContainerServiceServiceURLBB0F4736 = https://hello-container.kcdc.garoyeri.dev
-```
-
-
-
