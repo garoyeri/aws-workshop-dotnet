@@ -4,6 +4,13 @@ This project is a (very) minimal .NET 5 ASP.NET Core web application that can be
 
 [TOC]
 
+## Pre-Requisites
+
+* [Node JS LTS](https://nodejs.org/)
+* [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
+* [.NET Core SDK 5.0](https://dotnet.microsoft.com/download/dotnet/5.0) and [.NET Core SDK 3.1](https://dotnet.microsoft.com/download/dotnet/3.1)
+* [Docker Desktop](https://www.docker.com/products/docker-desktop)
+
 ## Setup AWS CLI
 
 The rest of the instructions assume that you've got an AWS account setup already, you've setup a programmatic access user, and created a local CLI profile called `personal` with the access key an secret key.
@@ -35,6 +42,10 @@ Go to [Containerized Application on Fargate](docs/03-hello-container.md).
 ## Workshop 04: Relational Database Madness
 
 Go to [Relational Database Madness](docs/04-hello-database.md).
+
+## Cleanup
+
+After you're done, make sure to delete everything you made here so you won't be billed extra for it. Go to [Cleaning Up Everything](docs/05-cleaning-up.md).
 
 ## Building this repository from scratch
 

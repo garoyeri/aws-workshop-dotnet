@@ -78,3 +78,7 @@ If everything is setup correctly, it should create a table in the database.
 You may have noticed that there was no password creation or handoff of credentials for the database. If you scour the CDK, you won't see a hardcoded password string anywhere. So what gives? Well, the CDK will generate a randomized secret password, and the database construct will populate the rest. The secret in AWS looks suspiciously like the `src/AwsHelloWorldWeb/DatabaseSettings.cs` file, and gets populated at startup.
 
 I've added the code from the [`Kralizek.Extensions.Configuration.AWSSecretsManager`](https://github.com/Kralizek/AWSSecretsManagerConfigurationExtensions) library, which needed an upgrade on its dependencies, but it otherwise unchanged. This magical little library will fetch the specified secrets and populate them in the configuration store.
+
+## Lambda Too!
+
+There is a Lambda + Database deployment stack as well: `DeployDatabaseLambdaStack` if you're interested. It works the same way, except that the API itself is a Lambda instead of a container. The migration function is still a Lambda (because that's easier).
