@@ -31,6 +31,8 @@ CDK_DEFAULT_REGION=us-east-1
 
 Save this file.
 
+## Deploy the Hosted Zone
+
 If you have a domain name handy, you can deploy a AWS Route53 Hosted Zone to provide "nice" domain names for your workshop items. In this case, we're using `kcdc.garoyeri.dev` as the subdomain root. Substitute your own domain name if you've got one.
 
 ```shell
