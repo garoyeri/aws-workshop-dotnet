@@ -10,6 +10,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "aws-cdk": "1.121.0"
+    "aws-cdk": "1.133.0"
   }
 }

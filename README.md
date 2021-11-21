@@ -116,7 +116,7 @@ You should see some YAML that represents the minimal empty CDK configuration.
 
 Let's also add this deployment project to the parent solution:
 
-```shel
+```shell
 cd ..
 dotnet sln add deploy/src/Deploy
 dotnet build

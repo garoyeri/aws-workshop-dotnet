@@ -24,7 +24,9 @@ namespace Deploy
                     Vpc = props.Vpc,
                     VpcSubnets = new SubnetSelection
                     {
+#pragma warning disable CS0618
                         SubnetType = SubnetType.PRIVATE
+#pragma warning restore CS0618
                     }
                 },
                 RemovalPolicy = props.RemovalPolicy
